@@ -1,11 +1,9 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>跳绳小达人 - 计时计数系统</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;700;800&family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 /* ========== CSS 变量 ========== */
 :root {
@@ -19,28 +17,41 @@
   --yellow: #FFE66D;
   --yellow-dark: #F5D442;
   --purple: #A78BFA;
-  --purple-light: #C4B5FD;
   --sky: #87CEEB;
   --dark: #2D3436;
   --dark-soft: #636E72;
   --white: #FFFFFF;
   --shadow-soft: 0 4px 20px rgba(0,0,0,0.08);
-  --shadow-medium: 0 8px 32px rgba(0,0,0,0.12);
   --shadow-heavy: 0 12px 48px rgba(0,0,0,0.16);
   --radius: 20px;
   --radius-sm: 12px;
   --radius-lg: 28px;
+  --font-base: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
 }
 
 /* ========== 基础重置 ========== */
 *, *::before, *::after {
   margin: 0; padding: 0; box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
 }
 
 html { font-size: 16px; scroll-behavior: smooth; }
 
+/* 移除所有可交互元素的点击聚焦框 */
+button, input, label, [onclick], .btn, .timer-opt, .toggle-wrap, .acc-btn, .interrupt-btn, .acc-reset-btn, .btn-save, .btn-close-modal {
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+}
+button:focus, input:focus, .btn:focus, .timer-opt:focus {
+  outline: none;
+}
+button:focus-visible, .btn:focus-visible {
+  outline: 2px solid var(--mint);
+  outline-offset: 2px;
+}
+
 body {
-  font-family: 'Quicksand', sans-serif;
+  font-family: var(--font-base);
   background: var(--cream);
   color: var(--dark);
   min-height: 100vh;
@@ -119,7 +130,6 @@ body::before {
   70% { transform: translateY(-8px); }
 }
 .header h1 {
-  font-family: 'Baloo 2', cursive;
   font-size: 2rem;
   font-weight: 800;
   background: linear-gradient(135deg, var(--coral), var(--purple));
@@ -157,7 +167,6 @@ body::before {
 }
 
 .card-title {
-  font-family: 'Baloo 2', cursive;
   font-size: 1.15rem;
   font-weight: 700;
   color: var(--dark);
@@ -220,7 +229,6 @@ body::before {
 
 .child-info { flex: 1; }
 .child-name {
-  font-family: 'Baloo 2', cursive;
   font-size: 1.4rem;
   font-weight: 700;
   color: var(--dark);
@@ -261,7 +269,6 @@ body::before {
   border: 2px solid #EEE;
   border-radius: var(--radius-sm);
   background: var(--white);
-  font-family: 'Baloo 2', cursive;
   font-size: 0.9rem;
   font-weight: 600;
   color: var(--dark-soft);
@@ -297,7 +304,6 @@ body::before {
   padding: 10px 14px;
   border: 2px solid #EEE;
   border-radius: var(--radius-sm);
-  font-family: 'Quicksand', sans-serif;
   font-size: 1rem;
   font-weight: 600;
   color: var(--dark);
@@ -351,7 +357,6 @@ body::before {
   text-align: center;
 }
 .timer-time .time-digits {
-  font-family: 'Baloo 2', cursive;
   font-size: 3.2rem;
   font-weight: 800;
   color: var(--dark);
@@ -414,7 +419,6 @@ body::before {
   text-align: center;
 }
 .interrupt-count .count-num {
-  font-family: 'Baloo 2', cursive;
   font-size: 2.4rem;
   font-weight: 800;
   color: var(--coral);
@@ -437,7 +441,6 @@ body::before {
   padding: 14px 32px;
   border: none;
   border-radius: 50px;
-  font-family: 'Baloo 2', cursive;
   font-size: 1.05rem;
   font-weight: 700;
   cursor: pointer;
@@ -516,25 +519,6 @@ body::before {
   to { opacity: 1; transform: scale(1) translateY(0); }
 }
 
-.modal-close {
-  position: absolute;
-  top: 12px;
-  right: 12px;
-  width: 32px;
-  height: 32px;
-  border: none;
-  background: rgba(255,255,255,0.8);
-  border-radius: 50%;
-  font-size: 1.1rem;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 2;
-  transition: all 0.2s;
-}
-.modal-close:hover { background: var(--white); transform: scale(1.1); }
-
 /* ========== 签名卡样式 ========== */
 .sign-card {
   position: relative;
@@ -559,7 +543,6 @@ body::before {
 }
 .sign-card-header .trophy { font-size: 48px; display: block; margin-bottom: 4px; }
 .sign-card-header h2 {
-  font-family: 'Baloo 2', cursive;
   font-size: 1.5rem;
   font-weight: 800;
   color: var(--white);
@@ -595,7 +578,6 @@ body::before {
   font-weight: 500;
 }
 .sign-card-row .row-value {
-  font-family: 'Baloo 2', cursive;
   font-size: 1.05rem;
   font-weight: 700;
   color: var(--dark);
@@ -619,7 +601,6 @@ body::before {
   padding: 6px 18px;
   border: 3px solid var(--mint);
   border-radius: 12px;
-  font-family: 'Baloo 2', cursive;
   font-size: 0.85rem;
   font-weight: 700;
   color: var(--mint-dark);
@@ -644,7 +625,6 @@ body::before {
   padding: 12px;
   border: none;
   border-radius: 50px;
-  font-family: 'Baloo 2', cursive;
   font-size: 0.95rem;
   font-weight: 700;
   cursor: pointer;
@@ -659,7 +639,6 @@ body::before {
   border: 2px solid #EEE;
   border-radius: 50px;
   background: var(--white);
-  font-family: 'Baloo 2', cursive;
   font-size: 0.95rem;
   font-weight: 700;
   color: var(--dark-soft);
@@ -674,7 +653,6 @@ body::before {
   text-align: center;
 }
 .edit-modal .modal-content h3 {
-  font-family: 'Baloo 2', cursive;
   font-size: 1.3rem;
   font-weight: 700;
   margin-bottom: 20px;
@@ -684,7 +662,6 @@ body::before {
   padding: 14px 18px;
   border: 2px solid #EEE;
   border-radius: var(--radius-sm);
-  font-family: 'Quicksand', sans-serif;
   font-size: 1.05rem;
   font-weight: 600;
   color: var(--dark);
@@ -741,7 +718,6 @@ body::before {
   margin-bottom: 12px;
 }
 .acc-title {
-  font-family: 'Baloo 2', cursive;
   font-size: 0.95rem;
   font-weight: 700;
   color: var(--dark);
@@ -789,7 +765,6 @@ body::before {
 }
 .acc-plus:hover { background: var(--mint-dark); }
 .acc-display {
-  font-family: 'Baloo 2', cursive;
   font-size: 1.6rem;
   font-weight: 800;
   color: var(--mint-dark);
@@ -836,7 +811,6 @@ body::before {
   border: 2px solid #C8E6C9;
   border-radius: 50px;
   background: var(--white);
-  font-family: 'Baloo 2', cursive;
   font-size: 0.8rem;
   font-weight: 700;
   color: var(--mint-dark);
@@ -855,21 +829,25 @@ body::before {
   align-items: center;
   justify-content: space-between;
   margin-top: 12px;
-  padding: 10px 14px;
-  background: rgba(255,255,255,0.6);
+  padding: 12px 16px;
+  background: rgba(255,255,255,0.7);
   border-radius: var(--radius-sm);
+}
+.rest-toggle-row > div:first-child {
+  flex: 1;
+  min-width: 0;
 }
 .rest-toggle-info {
   display: flex;
   align-items: center;
-  gap: 6px;
-  font-size: 0.85rem;
+  gap: 8px;
+  font-size: 0.95rem;
   font-weight: 600;
   color: var(--dark);
 }
-.rest-toggle-info .rest-icon { font-size: 1.1rem; }
+.rest-toggle-info .rest-icon { font-size: 1.2rem; }
 .rest-toggle-hint {
-  font-size: 0.68rem;
+  font-size: 0.7rem;
   color: var(--dark-soft);
   font-weight: 500;
 }
@@ -888,7 +866,6 @@ body::before {
   padding: 4px 16px;
   background: linear-gradient(135deg, var(--sky), #60B5D1);
   border-radius: 20px;
-  font-family: 'Baloo 2', cursive;
   font-size: 0.82rem;
   font-weight: 700;
   color: var(--white);
@@ -914,13 +891,12 @@ body::before {
   50% { box-shadow: 0 6px 32px rgba(135,206,235,0.6); }
 }
 
-/* ========== 提示音效果 ========== */
-.flash {
-  animation: flash 0.5s ease;
-}
-@keyframes flash {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.5; }
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-8px); }
+  40% { transform: translateX(8px); }
+  60% { transform: translateX(-4px); }
+  80% { transform: translateX(4px); }
 }
 
 /* ========== 播报开关 ========== */
@@ -937,7 +913,6 @@ body::before {
   display: flex;
   align-items: center;
   gap: 8px;
-  font-family: 'Baloo 2', cursive;
   font-size: 0.95rem;
   font-weight: 600;
   color: var(--dark);
@@ -1039,7 +1014,7 @@ body::before {
       </div>
       <div class="child-info">
         <div class="child-name" onclick="openNameEditor()">
-          <span id="childName">小明</span>
+          <span id="childName">点击修改用户名</span>
           <span class="edit-hint">点击修改</span>
         </div>
         <div class="child-tag">⭐ 跳绳达人</div>
@@ -1169,7 +1144,7 @@ body::before {
         <div class="row-icon icon-child" id="cardAvatar">👦</div>
         <div>
           <div class="row-label">小达人</div>
-          <div class="row-value" id="cardChildName">小明</div>
+          <div class="row-value" id="cardChildName">点击修改用户名</div>
         </div>
       </div>
       <div class="sign-card-row">
@@ -1221,7 +1196,7 @@ body::before {
 <script>
 // ========== 状态管理 ==========
 const state = {
-  childName: localStorage.getItem('jump_childName') || '小明',
+  childName: localStorage.getItem('jump_childName') || '点击修改用户名',
   avatarSrc: localStorage.getItem('jump_avatarSrc') || null,
   selectedMinutes: 1,
   totalSeconds: 60,
@@ -1245,29 +1220,27 @@ const state = {
   waitingNextRound: false,  // 休息结束，等待手动开始下一轮
 };
 
-// ========== 语音播报模块（多引擎兼容方案） ==========
+// ========== 语音播报模块（PakePlus/WebView 兼容方案） ==========
+// 三层降级策略：
+// 1. Web Speech API（浏览器原生，WebView 通常不可用）
+// 2. 在线 TTS（直接通过 Audio 元素 src 加载，绕过 CORS 限制）
+// 3. 增强版蜂鸣音效（纯 Web Audio API，完全离线兜底）
 const broadcast = {
-  // AudioContext 实例，用于蜂鸣音兜底
   _audioCtx: null,
-  // 当前正在播放的 Audio 元素
   _currentAudio: null,
-  // 标记 AudioContext 是否已解锁
   _audioUnlocked: false,
-  // Web Speech API 是否可用（运行时检测）
-  _speechAvailable: false,
-  // 缓存中文语音
+  _speechTested: false,
+  _speechReallyWorks: false,
   _zhVoice: null,
 
   /** 初始化 */
   init() {
-    // 检测 Web Speech API
     if ('speechSynthesis' in window) {
       const loadVoices = () => {
         const voices = window.speechSynthesis.getVoices();
         this._zhVoice = voices.find(v => v.lang === 'zh-CN')
           || voices.find(v => v.lang.startsWith('zh'))
           || null;
-        if (voices.length > 0) this._speechAvailable = true;
       };
       loadVoices();
       if (window.speechSynthesis.onvoiceschanged !== undefined) {
@@ -1276,25 +1249,27 @@ const broadcast = {
     }
   },
 
-  /**
-   * 在用户手势（点击）中调用，解锁移动端音频播放限制。
-   * 同时解锁 AudioContext 和 speechSynthesis。
-   */
+  /** 在用户手势中调用，解锁音频播放 */
   unlock() {
     if (this._audioUnlocked) return;
-    // 解锁 AudioContext（用于蜂鸣音兜底）
+    // 解锁 AudioContext
     try {
       const AudioCtx = window.AudioContext || window.webkitAudioContext;
       if (AudioCtx) {
         this._audioCtx = new AudioCtx();
-        // 播放一段极短的静音来解锁
         const buf = this._audioCtx.createBuffer(1, 1, 22050);
         const src = this._audioCtx.createBufferSource();
         src.buffer = buf;
         src.connect(this._audioCtx.destination);
         src.start(0);
       }
-    } catch(e) { /* 忽略 */ }
+    } catch(e) {}
+    // 解锁 Audio 元素
+    try {
+      const s = new Audio('data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQAAAAA=');
+      s.volume = 0;
+      s.play().catch(() => {});
+    } catch(e) {}
     // 解锁 speechSynthesis
     if ('speechSynthesis' in window) {
       try {
@@ -1302,55 +1277,157 @@ const broadcast = {
         u.volume = 0;
         u.lang = 'zh-CN';
         window.speechSynthesis.speak(u);
-      } catch(e) { /* 忽略 */ }
+      } catch(e) {}
     }
-    // 解锁 Audio 元素播放
-    try {
-      const silentAudio = new Audio('data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQAAAAA=');
-      silentAudio.volume = 0;
-      silentAudio.play().catch(() => {});
-    } catch(e) { /* 忽略 */ }
     this._audioUnlocked = true;
+    this._testSpeechSynthesis();
+  },
+
+  /** 测试 speechSynthesis 是否真的能发声 */
+  _testSpeechSynthesis() {
+    if (this._speechTested || !('speechSynthesis' in window)) {
+      this._speechTested = true;
+      return;
+    }
+    try {
+      const u = new SpeechSynthesisUtterance('测试');
+      u.lang = 'zh-CN';
+      u.volume = 0.01;
+      if (this._zhVoice) u.voice = this._zhVoice;
+      let started = false;
+      u.onstart = () => { started = true; this._speechReallyWorks = true; this._speechTested = true; };
+      u.onend = () => { if (!started) this._speechReallyWorks = false; this._speechTested = true; };
+      u.onerror = () => { this._speechReallyWorks = false; this._speechTested = true; };
+      setTimeout(() => { if (!this._speechTested) { this._speechReallyWorks = started; this._speechTested = true; } }, 2000);
+      window.speechSynthesis.speak(u);
+    } catch(e) {
+      this._speechReallyWorks = false;
+      this._speechTested = true;
+    }
   },
 
   /**
-   * 核心播报方法 - 多引擎降级策略：
-   * 1. 优先尝试 Web Speech API
-   * 2. 失败则用蜂鸣音提示
+   * 核心播报 - 三层降级
    */
   speak(text) {
     if (!state.broadcastEnabled) return;
-    // 方案1：Web Speech API
-    if (this._trySpeechSynthesis(text)) return;
-    // 方案2：蜂鸣音兜底（至少有声音提醒）
-    this._playBeep();
+    // 1. speechSynthesis（确认可用时）
+    if (this._speechReallyWorks && this._trySpeech(text)) return;
+    // 2. 在线 TTS（Audio 元素直接加载 URL，不走 fetch，绕过 CORS）
+    this._playTTS(text);
   },
 
-  /** 尝试使用 Web Speech API */
-  _trySpeechSynthesis(text) {
+  /** Web Speech API */
+  _trySpeech(text) {
     if (!('speechSynthesis' in window)) return false;
     try {
       window.speechSynthesis.cancel();
-      const utterance = new SpeechSynthesisUtterance(text);
-      utterance.lang = 'zh-CN';
-      utterance.rate = 1.05;
-      utterance.pitch = 1.1;
-      utterance.volume = 1;
-      if (this._zhVoice) utterance.voice = this._zhVoice;
-      // 监听是否真的能播放
+      const u = new SpeechSynthesisUtterance(text);
+      u.lang = 'zh-CN';
+      u.rate = 1.05;
+      u.pitch = 1.1;
+      u.volume = 1;
+      if (this._zhVoice) u.voice = this._zhVoice;
       let spoke = false;
-      utterance.onstart = () => { spoke = true; };
-      utterance.onerror = () => {
-        if (!spoke) this._playBeep();
-      };
-      window.speechSynthesis.speak(utterance);
+      u.onstart = () => { spoke = true; };
+      u.onerror = () => { if (!spoke) this._playTTS(text); };
+      window.speechSynthesis.speak(u);
       return true;
+    } catch(e) { return false; }
+  },
+
+  /**
+   * 在线 TTS - 多源轮换 + 故障自动切换
+   * 直接设置 Audio.src，不走 fetch，绕过 CORS
+   */
+  // 记录上次成功的 TTS 源索引，优先使用
+  _lastGoodTTS: 0,
+
+  /** 构建多个 TTS 源 URL */
+  _getTTSUrls(text) {
+    const encoded = encodeURIComponent(text);
+    return [
+      // 有道词典 TTS（中文支持好）
+      `https://dict.youdao.com/dictvoice?audio=${encoded}&le=zh`,
+      // 搜狗 TTS
+      `https://fanyi.sogou.com/reventondc/synthesis?text=${encoded}&speed=1&lang=zh-CHS&from=translateweb&speaker=6`,
+      // 百度翻译 TTS
+      `https://fanyi.baidu.com/gettts?lan=zh&text=${encoded}&spd=5&source=web`,
+    ];
+  },
+
+  _playTTS(text, triedIndices) {
+    const urls = this._getTTSUrls(text);
+    const tried = triedIndices || [];
+
+    // 确定本次尝试的索引：优先用上次成功的源，否则按顺序找未试过的
+    let idx = -1;
+    if (tried.length === 0 && this._lastGoodTTS < urls.length) {
+      idx = this._lastGoodTTS;
+    } else {
+      for (let i = 0; i < urls.length; i++) {
+        if (tried.indexOf(i) === -1) { idx = i; break; }
+      }
+    }
+
+    // 所有源都试过了，降级蜂鸣音
+    if (idx === -1) {
+      this._playContextBeep(text);
+      return;
+    }
+
+    tried.push(idx);
+    const url = urls[idx];
+
+    try {
+      if (this._currentAudio) {
+        this._currentAudio.pause();
+        this._currentAudio.currentTime = 0;
+      }
+      const audio = new Audio();
+      this._currentAudio = audio;
+      audio.volume = 1;
+      let playing = false;
+      let fellBack = false;
+      const tryNext = () => {
+        if (fellBack) return;
+        fellBack = true;
+        clearTimeout(timeout);
+        this._playTTS(text, tried);
+      };
+      audio.onerror = tryNext;
+      audio.onplay = () => {
+        playing = true;
+        this._lastGoodTTS = idx;
+      };
+      const timeout = setTimeout(() => { if (!playing) tryNext(); }, 3000);
+      audio.onended = () => { clearTimeout(timeout); };
+      audio.src = url;
+      audio.play().catch(() => { tryNext(); });
     } catch(e) {
-      return false;
+      this._playTTS(text, tried);
     }
   },
 
-  /** 使用 AudioContext 播放蜂鸣提示音 */
+  /** 根据内容选择蜂鸣音效 */
+  _playContextBeep(text) {
+    if (text.includes('开始') || text.includes('加油')) {
+      this._playDoubleBeep();
+    } else if (text.includes('时间到') || text.includes('完成')) {
+      this._playFinishSound();
+    } else if (text.includes('暂停')) {
+      this._playBeep(660, 0.3);
+    } else if (text.includes('冲刺')) {
+      this._playTripleBeep();
+    } else if (/^\d+$/.test(text)) {
+      const num = parseInt(text);
+      this._playBeep(600 + (10 - num) * 60, 0.12);
+    } else {
+      this._playBeep();
+    }
+  },
+
+  /** AudioContext 蜂鸣音 */
   _playBeep(freq = 880, duration = 0.15) {
     try {
       const ctx = this._audioCtx;
@@ -1366,79 +1443,46 @@ const broadcast = {
       gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + duration);
       osc.start(ctx.currentTime);
       osc.stop(ctx.currentTime + duration);
-    } catch(e) { /* 忽略 */ }
+    } catch(e) {}
   },
 
-  /** 播放双音提示（用于重要节点，如开始/结束） */
   _playDoubleBeep() {
     this._playBeep(880, 0.15);
     setTimeout(() => this._playBeep(1100, 0.2), 200);
   },
 
-  /** 播放完成音效（三连音） */
+  _playTripleBeep() {
+    this._playBeep(800, 0.1);
+    setTimeout(() => this._playBeep(1000, 0.1), 150);
+    setTimeout(() => this._playBeep(1200, 0.15), 300);
+  },
+
   _playFinishSound() {
     this._playBeep(880, 0.12);
     setTimeout(() => this._playBeep(1100, 0.12), 150);
     setTimeout(() => this._playBeep(1320, 0.25), 300);
   },
 
-  /** 开始计时播报 */
-  onStart(minutes) {
-    this.speak(`计时开始，${minutes}分钟跳绳，加油！`);
-  },
+  onStart(minutes) { this.speak(`计时开始，${minutes}分钟跳绳，加油！`); },
+  onPause() { this.speak('已暂停'); },
+  onResume() { this.speak('继续，加油！'); },
+  onMinuteMark(mins) { if (mins > 0) this.speak(`还剩${mins}分钟`); },
+  onCountdown(s) { if (!state.broadcastEnabled) return; this.speak(`${s}`); },
+  onFinish(name) { if (!state.broadcastEnabled) return; this.speak(`时间到！${name}太棒了，跳绳完成！`); },
 
-  /** 暂停播报 */
-  onPause() {
-    this.speak('已暂停');
-  },
-
-  /** 继续播报 */
-  onResume() {
-    this.speak('继续，加油！');
-  },
-
-  /** 每分钟播报 */
-  onMinuteMark(remainingMins) {
-    if (remainingMins > 0) {
-      this.speak(`还剩${remainingMins}分钟`);
-    }
-  },
-
-  /** 最后10秒倒数播报 */
-  onCountdown(seconds) {
-    // 倒计时用语音说数字，如果语音不可用则用蜂鸣
-    if (!state.broadcastEnabled) return;
-    if (!this._trySpeechSynthesis(`${seconds}`)) {
-      // 蜂鸣音频率随倒计时升高，营造紧迫感
-      const freq = 600 + (10 - seconds) * 60;
-      this._playBeep(freq, 0.1);
-    }
-  },
-
-  /** 完成播报 */
-  onFinish(name) {
-    if (!state.broadcastEnabled) return;
-    if (!this._trySpeechSynthesis(`时间到！${name}太棒了，跳绳完成！`)) {
-      this._playFinishSound();
-    }
-  },
-
-  /** 根据剩余秒数判断是否需要播报 */
   checkAndSpeak(remaining, total) {
     if (!state.broadcastEnabled) return;
-    // 最后10秒逐秒倒数
-    if (remaining <= 10 && remaining > 0) {
-      this.onCountdown(remaining);
-      return;
-    }
-    // 最后30秒提醒（仅一次）
-    if (remaining === 30 && total > 30) {
-      this.speak('还剩30秒，冲刺！');
-      return;
-    }
-    // 每分钟整点播报
-    if (remaining > 0 && remaining % 60 === 0) {
-      this.onMinuteMark(remaining / 60);
+    if (remaining <= 10 && remaining > 0) { this.onCountdown(remaining); return; }
+    if (remaining === 30 && total > 30) { this.speak('还剩30秒，冲刺！'); return; }
+    if (remaining > 0 && remaining % 60 === 0) { this.onMinuteMark(remaining / 60); }
+  },
+
+  stopAll() {
+    try { window.speechSynthesis && window.speechSynthesis.cancel(); } catch(e) {}
+    if (this._currentAudio) {
+      this._currentAudio.pause();
+      this._currentAudio.currentTime = 0;
+      this._currentAudio = null;
     }
   }
 };
@@ -1449,12 +1493,7 @@ const bcStatusDot = document.getElementById('bcStatus');
 bcToggle.addEventListener('change', function() {
   state.broadcastEnabled = this.checked;
   if (!this.checked) {
-    // 停止所有音频
-    window.speechSynthesis && window.speechSynthesis.cancel();
-    if (broadcast._currentAudio) {
-      broadcast._currentAudio.pause();
-      broadcast._currentAudio = null;
-    }
+    broadcast.stopAll();
     bcStatusDot.classList.remove('active');
   }
 });
@@ -1486,7 +1525,7 @@ ringProgress.style.strokeDashoffset = '0';
 // ========== 时长选择 ==========
 document.querySelectorAll('.timer-opt').forEach(opt => {
   opt.addEventListener('click', function() {
-    if (state.isRunning) return; // 运行中不允许切换
+    if (state.isRunning || state.isResting || state.waitingNextRound) return;
 
     // 移除所有 active
     document.querySelectorAll('.timer-opt').forEach(o => o.classList.remove('active'));
@@ -1512,7 +1551,7 @@ document.querySelectorAll('.timer-opt').forEach(opt => {
 $('customMinutes').addEventListener('input', function() {
   let val = parseInt(this.value);
   if (val > 120) { this.value = 120; val = 120; }
-  if (val > 0 && !state.isRunning) {
+  if (val > 0 && !state.isRunning && !state.isResting && !state.waitingNextRound) {
     setDuration(val);
   }
 });
@@ -1543,6 +1582,9 @@ function updateRing() {
 }
 
 // ========== 计时器控制 ==========
+// 用真实时间校准，避免手机切后台/锁屏时 setInterval 漂移
+let _tickExpectedTime = 0; // 下一次 tick 的预期时间戳
+
 function startTimer() {
   if (state.isFinished) return;
 
@@ -1567,19 +1609,17 @@ function startTimer() {
     timerDisplay.classList.remove('resting');
     timerDisplay.classList.add('running');
     if (state.broadcastEnabled) bcStatusDot.classList.add('active');
-    broadcast.speak(`第${state.accCurrentRound}轮开始，加油！`);
-    state.timerId = setInterval(timerTick, 1000);
+    setTimeout(() => broadcast.speak(`第${state.accCurrentRound}轮开始，加油！`), 100);
+    _startTick();
     return;
   }
 
   if (state.isRunning && !state.isPaused) {
     // 暂停 - 自动加一次中断次数
     state.isPaused = true;
-    clearInterval(state.timerId);
-    state.timerId = null;
+    _stopTick();
     state.interrupts++;
     interruptCountEl.textContent = state.interrupts;
-    // 中断数弹跳动画
     interruptCountEl.style.transform = 'scale(1.3)';
     setTimeout(() => { interruptCountEl.style.transform = 'scale(1)'; }, 200);
     btnStart.innerHTML = '▶ 继续';
@@ -1587,18 +1627,17 @@ function startTimer() {
     timeLabel.textContent = '已暂停';
     timerDisplay.classList.remove('running');
     bcStatusDot.classList.remove('active');
-    broadcast.onPause();
+    setTimeout(() => broadcast.onPause(), 100);
     return;
   }
 
   if (state.isPaused) {
     // 从暂停恢复
     state.isPaused = false;
-    broadcast.onResume();
+    setTimeout(() => broadcast.onResume(), 100);
   } else {
     // 全新开始
     state.startTimestamp = new Date();
-    // 确保自定义时间已设置
     const activeOpt = document.querySelector('.timer-opt.active');
     if (activeOpt && activeOpt.dataset.minutes === 'custom') {
       const customVal = parseInt($('customMinutes').value);
@@ -1608,7 +1647,7 @@ function startTimer() {
       }
       setDuration(customVal);
     }
-    broadcast.onStart(state.selectedMinutes);
+    setTimeout(() => broadcast.onStart(state.selectedMinutes), 100);
   }
 
   state.isRunning = true;
@@ -1619,31 +1658,55 @@ function startTimer() {
   timerDisplay.classList.add('running');
   if (state.broadcastEnabled) bcStatusDot.classList.add('active');
 
-  state.timerId = setInterval(timerTick, 1000);
+  _startTick();
+}
+
+/** 启动精准定时器（自校准） */
+function _startTick() {
+  _stopTick();
+  _tickExpectedTime = Date.now() + 1000;
+  state.timerId = setTimeout(_tickLoop, 1000);
+}
+
+/** 停止定时器 */
+function _stopTick() {
+  if (state.timerId) {
+    clearTimeout(state.timerId);
+    state.timerId = null;
+  }
+}
+
+/** 自校准 tick 循环：根据真实时间差补偿漂移 */
+function _tickLoop() {
+  const drift = Date.now() - _tickExpectedTime;
+  // 先记录当前 timerId，timerTick 内部可能会 _stopTick + _startTick
+  const prevId = state.timerId;
+  timerTick();
+  // 只有当 timerTick 没有重新启动定时器（timerId 未变或被清空）时，才安排下一次
+  // 如果 timerTick 内部调用了 _startTick（轮次切换），新的 tick 循环已经启动，不需要再安排
+  if (state.timerId === prevId && state.timerId !== null) {
+    _tickExpectedTime += 1000;
+    state.timerId = setTimeout(_tickLoop, Math.max(0, 1000 - drift));
+  }
 }
 
 function timerTick() {
     // 休息倒计时模式
     if (state.isResting) {
       state.restRemaining--;
-      // 更新显示为休息倒计时
       const mins = Math.floor(state.restRemaining / 60);
       const secs = state.restRemaining % 60;
       timeDigits.textContent = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
-      // 更新环形进度（基于休息时长）
       const progress = state.restRemaining / state.restSeconds;
       const offset = circumference * (1 - progress);
       ringProgress.style.strokeDashoffset = offset;
 
-      // 休息最后5秒播报
       if (state.restRemaining <= 5 && state.restRemaining > 0) {
         broadcast.onCountdown(state.restRemaining);
       }
 
       if (state.restRemaining <= 0) {
-        // 休息结束，等待手动开始下一轮
-        clearInterval(state.timerId);
-        state.timerId = null;
+        _stopTick();
         state.isResting = false;
         state.waitingNextRound = true;
         state.isRunning = false;
@@ -1663,24 +1726,17 @@ function timerTick() {
     updateTimerDisplay();
     updateRing();
 
-    // iOS Safari 会在后台挂起 speechSynthesis，定期 resume 保持活跃
     if (window.speechSynthesis && window.speechSynthesis.speaking) {
       window.speechSynthesis.resume();
     }
 
-    // 语音播报检查
     broadcast.checkAndSpeak(state.remainingSeconds, state.totalSeconds);
 
     if (state.remainingSeconds <= 0) {
-      // 当前轮结束
-      clearInterval(state.timerId);
-      state.timerId = null;
+      _stopTick();
 
       if (state.accCurrentRound < state.accTotalRounds) {
-        // 还有下一轮
         if (state.restEnabled) {
-          // 开启了轮间休息，进入休息倒计时
-          // 保存当前轮中断次数
           state.interruptsPerRound[state.accCurrentRound - 1] = state.interrupts;
           state.isResting = true;
           state.restRemaining = state.restSeconds;
@@ -1692,17 +1748,12 @@ function timerTick() {
           btnStart.className = 'btn btn-pause';
           btnStart.disabled = true;
           broadcast.speak(`本轮结束，休息1分钟`);
-          // 更新显示为休息时间
           const mins = Math.floor(state.restRemaining / 60);
           const secs = state.restRemaining % 60;
           timeDigits.textContent = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
-          // 重置环形为休息进度
           ringProgress.style.strokeDashoffset = '0';
-          // 启动休息倒计时
-          state.timerId = setInterval(timerTick, 1000);
+          _startTick();
         } else {
-          // 没有休息，直接自动开始下一轮
-          // 保存当前轮中断次数，新轮归零
           state.interruptsPerRound[state.accCurrentRound - 1] = state.interrupts;
           state.accCurrentRound++;
           state.interrupts = 0;
@@ -1713,11 +1764,9 @@ function timerTick() {
           updateAccDisplay();
           broadcast.speak(`第${state.accCurrentRound}轮开始，加油！`);
           timeLabel.textContent = `跳绳中... 第${state.accCurrentRound}/${state.accTotalRounds}轮`;
-          // 重新启动定时器
-          state.timerId = setInterval(timerTick, 1000);
+          _startTick();
         }
       } else {
-        // 全部轮次完成
         state.interruptsPerRound[state.accCurrentRound - 1] = state.interrupts;
         state.isRunning = false;
         state.isFinished = true;
@@ -1734,18 +1783,12 @@ function timerTick() {
 }
 
 function resetTimer() {
-  // 记录当前是否在休息中
   const wasResting = state.isResting;
 
-  clearInterval(state.timerId);
-  state.timerId = null;
+  _stopTick();
 
   // 停止所有音频播报
-  window.speechSynthesis && window.speechSynthesis.cancel();
-  if (broadcast._currentAudio) {
-    broadcast._currentAudio.pause();
-    broadcast._currentAudio = null;
-  }
+  broadcast.stopAll();
   bcStatusDot.classList.remove('active');
   timerDisplay.classList.remove('running');
   timerDisplay.classList.remove('resting');
@@ -1811,17 +1854,46 @@ function openAvatarPicker() {
 function handleAvatarChange(event) {
   const file = event.target.files[0];
   if (!file) return;
-  // 验证文件类型
   if (!file.type.startsWith('image/')) return;
 
   const reader = new FileReader();
   reader.onload = function(e) {
-    state.avatarSrc = e.target.result;
-    const avatarEl = $('avatarDisplay');
-    avatarEl.innerHTML = `<img src="${e.target.result}" alt="头像">`;
-    localStorage.setItem('jump_avatarSrc', e.target.result);
+    // 压缩头像到 200x200，减少 localStorage 占用
+    const img = new Image();
+    img.onload = function() {
+      const canvas = document.createElement('canvas');
+      const size = 200;
+      canvas.width = size;
+      canvas.height = size;
+      const ctx = canvas.getContext('2d');
+      // 居中裁剪为正方形
+      const min = Math.min(img.width, img.height);
+      const sx = (img.width - min) / 2;
+      const sy = (img.height - min) / 2;
+      ctx.drawImage(img, sx, sy, min, min, 0, 0, size, size);
+      const compressed = canvas.toDataURL('image/jpeg', 0.8);
+      state.avatarSrc = compressed;
+      setAvatarImg($('avatarDisplay'), compressed);
+      localStorage.setItem('jump_avatarSrc', compressed);
+    };
+    img.onerror = function() {
+      // 压缩失败，直接用原图
+      state.avatarSrc = e.target.result;
+      setAvatarImg($('avatarDisplay'), e.target.result);
+      localStorage.setItem('jump_avatarSrc', e.target.result);
+    };
+    img.src = e.target.result;
   };
   reader.readAsDataURL(file);
+}
+
+/** 安全设置头像图片（DOM API，避免 innerHTML） */
+function setAvatarImg(container, src) {
+  container.textContent = '';
+  const img = document.createElement('img');
+  img.src = src;
+  img.alt = '头像';
+  container.appendChild(img);
 }
 
 function openNameEditor() {
@@ -1859,7 +1931,7 @@ function generateCard() {
   // 同步头像到签名卡
   const cardAvatarEl = $('cardAvatar');
   if (state.avatarSrc) {
-    cardAvatarEl.innerHTML = `<img src="${state.avatarSrc}" alt="头像">`;
+    setAvatarImg(cardAvatarEl, state.avatarSrc);
   } else {
     cardAvatarEl.textContent = '👦';
   }
@@ -1909,10 +1981,10 @@ function saveCard() {
 
     // 头部文字
     ctx.fillStyle = '#FFFFFF';
-    ctx.font = '36px "Baloo 2", sans-serif';
+    ctx.font = '36px sans-serif';
     ctx.textAlign = 'center';
     ctx.fillText('🏆', w / 2, 55);
-    ctx.font = 'bold 26px "Baloo 2", sans-serif';
+    ctx.font = 'bold 26px sans-serif';
     ctx.fillText('跳绳达人签名卡', w / 2, 100);
 
     // 信息区域
@@ -1960,6 +2032,14 @@ function saveCard() {
       ctx.fillText(row.label, 80, y - 8);
       ctx.font = 'bold 17px sans-serif';
       ctx.fillStyle = '#2D3436';
+      // 文字溢出保护：超出可用宽度时自动缩小字号
+      const maxValueWidth = w - 80 - 160; // 左边距80 + 右侧印章区域160
+      let valueFontSize = 17;
+      ctx.font = `bold ${valueFontSize}px sans-serif`;
+      while (ctx.measureText(row.value).width > maxValueWidth && valueFontSize > 10) {
+        valueFontSize--;
+        ctx.font = `bold ${valueFontSize}px sans-serif`;
+      }
       ctx.fillText(row.value, 80, y + 14);
       // 分隔线
       ctx.strokeStyle = '#F0F0F0';
@@ -2078,7 +2158,7 @@ function launchConfetti() {
 
 // ========== 累计倒计时轮数控制 ==========
 function changeAccRounds(delta) {
-  if (state.isRunning) return; // 运行中不允许修改
+  if (state.isRunning || state.isResting || state.waitingNextRound) return;
   state.accTotalRounds = Math.max(1, state.accTotalRounds + delta);
   state.accCurrentRound = 1;
   updateAccDisplay();
@@ -2134,19 +2214,6 @@ function shakeElement(el) {
   el.style.animation = 'shake 0.4s ease';
 }
 
-// 添加 shake 动画
-const shakeStyle = document.createElement('style');
-shakeStyle.textContent = `
-  @keyframes shake {
-    0%, 100% { transform: translateX(0); }
-    20% { transform: translateX(-8px); }
-    40% { transform: translateX(8px); }
-    60% { transform: translateX(-4px); }
-    80% { transform: translateX(4px); }
-  }
-`;
-document.head.appendChild(shakeStyle);
-
 // 点击弹窗外部关闭
 $('cardModal').addEventListener('click', function(e) {
   if (e.target === this) closeCardModal();
@@ -2159,10 +2226,35 @@ $('nameModal').addEventListener('click', function(e) {
 updateTimerDisplay();
 updateAccDisplay();
 
+// 页面可见性变化时校准计时器（手机锁屏/切后台恢复后补偿丢失的秒数）
+document.addEventListener('visibilitychange', function() {
+  if (document.visibilityState !== 'visible') return;
+  if (!state.isRunning && !state.isResting) return;
+  const now = Date.now();
+  const elapsed = Math.floor((now - _tickExpectedTime) / 1000);
+  if (elapsed <= 0) return;
+
+  if (state.isResting) {
+    state.restRemaining = Math.max(0, state.restRemaining - elapsed);
+    // 更新休息显示
+    const mins = Math.floor(state.restRemaining / 60);
+    const secs = state.restRemaining % 60;
+    timeDigits.textContent = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+    const progress = state.restRemaining / state.restSeconds;
+    ringProgress.style.strokeDashoffset = circumference * (1 - progress);
+  } else {
+    state.remainingSeconds = Math.max(0, state.remainingSeconds - elapsed);
+    updateTimerDisplay();
+    updateRing();
+  }
+  // 校准预期时间，让下一次 tick 立即触发以处理可能的轮次结束/休息结束
+  _tickExpectedTime = now;
+});
+
 // 从缓存恢复姓名和头像
 $('childName').textContent = state.childName;
 if (state.avatarSrc) {
-  $('avatarDisplay').innerHTML = `<img src="${state.avatarSrc}" alt="头像">`;
+  setAvatarImg($('avatarDisplay'), state.avatarSrc);
 }
 </script>
 </body>
