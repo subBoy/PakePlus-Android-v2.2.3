@@ -447,8 +447,13 @@ body::before {
   transition: all 0.25s ease;
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 8px;
   user-select: none;
+  white-space: nowrap;
+  flex-shrink: 1;
+  min-width: 0;
+  text-align: center;
 }
 .btn:active { transform: scale(0.95); }
 .btn-start {
@@ -1218,6 +1223,8 @@ const state = {
   restSeconds: 60,          // 休息时长（秒）
   restRemaining: 60,        // 休息剩余秒数
   waitingNextRound: false,  // 休息结束，等待手动开始下一轮
+  isSpeaking: false,        // 播报等待中，防止重复点击
+  _speakCancelToken: 0,     // 播报取消令牌，resetTimer 时递增以丢弃过期回调
 };
 
 // ========== 语音播报模块（PakePlus/WebView 兼容方案） ==========
@@ -1232,6 +1239,7 @@ const broadcast = {
   _speechTested: false,
   _speechReallyWorks: false,
   _zhVoice: null,
+  _activeSafetyTimers: [],  // 追踪活跃的安全超时定时器
 
   /** 初始化 */
   init() {
@@ -1273,14 +1281,17 @@ const broadcast = {
     // 解锁 speechSynthesis
     if ('speechSynthesis' in window) {
       try {
+        window.speechSynthesis.cancel(); // 先清空队列
         const u = new SpeechSynthesisUtterance('');
         u.volume = 0;
         u.lang = 'zh-CN';
         window.speechSynthesis.speak(u);
+        // 等空字符串播完后再测试，避免队列堆积
+        u.onend = () => { this._testSpeechSynthesis(); };
+        u.onerror = () => { this._testSpeechSynthesis(); };
       } catch(e) {}
     }
     this._audioUnlocked = true;
-    this._testSpeechSynthesis();
   },
 
   /** 测试 speechSynthesis 是否真的能发声 */
@@ -1307,18 +1318,21 @@ const broadcast = {
   },
 
   /**
-   * 核心播报 - 三层降级
+   * 核心播报 - 三层降级，返回 Promise，播报完成后 resolve
    */
-  speak(text) {
-    if (!state.broadcastEnabled) return;
-    // 1. speechSynthesis（确认可用时）
-    if (this._speechReallyWorks && this._trySpeech(text)) return;
+  speak(text, callback) {
+    if (!state.broadcastEnabled) {
+      if (callback) callback();
+      return;
+    }
+    // 1. speechSynthesis（确认可用时，或测试尚未完成时乐观尝试）
+    if ((this._speechReallyWorks || !this._speechTested) && this._trySpeech(text, callback)) return;
     // 2. 在线 TTS（Audio 元素直接加载 URL，不走 fetch，绕过 CORS）
-    this._playTTS(text);
+    this._playTTS(text, undefined, callback);
   },
 
   /** Web Speech API */
-  _trySpeech(text) {
+  _trySpeech(text, callback) {
     if (!('speechSynthesis' in window)) return false;
     try {
       window.speechSynthesis.cancel();
@@ -1329,9 +1343,16 @@ const broadcast = {
       u.volume = 1;
       if (this._zhVoice) u.voice = this._zhVoice;
       let spoke = false;
+      let done = false;
+      let safetyTimer;
+      const finish = () => { if (!done) { done = true; clearTimeout(safetyTimer); this._removeSafetyTimer(safetyTimer); if (callback) callback(); } };
       u.onstart = () => { spoke = true; };
-      u.onerror = () => { if (!spoke) this._playTTS(text); };
+      u.onend = finish;
+      u.onerror = () => { if (!spoke) { clearTimeout(safetyTimer); this._removeSafetyTimer(safetyTimer); this._playTTS(text, undefined, callback); } else { finish(); } };
       window.speechSynthesis.speak(u);
+      // 安全超时：防止 onend 永远不触发
+      safetyTimer = setTimeout(() => { finish(); }, 30000);
+      this._activeSafetyTimers.push(safetyTimer);
       return true;
     } catch(e) { return false; }
   },
@@ -1356,7 +1377,7 @@ const broadcast = {
     ];
   },
 
-  _playTTS(text, triedIndices) {
+  _playTTS(text, triedIndices, callback) {
     const urls = this._getTTSUrls(text);
     const tried = triedIndices || [];
 
@@ -1373,6 +1394,7 @@ const broadcast = {
     // 所有源都试过了，降级蜂鸣音
     if (idx === -1) {
       this._playContextBeep(text);
+      if (callback) callback();
       return;
     }
 
@@ -1389,23 +1411,33 @@ const broadcast = {
       audio.volume = 1;
       let playing = false;
       let fellBack = false;
+      let cbCalled = false;
+      let safetyTimeout = null;
+      const callCb = () => { if (!cbCalled) { cbCalled = true; clearTimeout(safetyTimeout); this._removeSafetyTimer(safetyTimeout); if (callback) callback(); } };
       const tryNext = () => {
         if (fellBack) return;
         fellBack = true;
         clearTimeout(timeout);
-        this._playTTS(text, tried);
+        if (safetyTimeout) { clearTimeout(safetyTimeout); this._removeSafetyTimer(safetyTimeout); }
+        this._playTTS(text, tried, callback);
       };
-      audio.onerror = tryNext;
+      audio.onerror = () => {
+        if (playing) { clearTimeout(timeout); callCb(); } // 已开始播放后出错，视为播完
+        else { tryNext(); }
+      };
       audio.onplay = () => {
         playing = true;
         this._lastGoodTTS = idx;
+        // 安全超时：音频开始播放后最多等30秒，防止 onended 不触发导致卡死
+        safetyTimeout = setTimeout(() => { callCb(); }, 30000);
+        this._activeSafetyTimers.push(safetyTimeout);
       };
       const timeout = setTimeout(() => { if (!playing) tryNext(); }, 3000);
-      audio.onended = () => { clearTimeout(timeout); };
+      audio.onended = () => { clearTimeout(timeout); callCb(); };
       audio.src = url;
       audio.play().catch(() => { tryNext(); });
     } catch(e) {
-      this._playTTS(text, tried);
+      this._playTTS(text, tried, callback);
     }
   },
 
@@ -1463,12 +1495,19 @@ const broadcast = {
     setTimeout(() => this._playBeep(1320, 0.25), 300);
   },
 
-  onStart(minutes) { this.speak(`计时开始，${minutes}分钟跳绳，加油！`); },
+  onStart(minutes, callback) { this.speak(`计时开始，${minutes}分钟跳绳，加油！`, callback); },
   onPause() { this.speak('已暂停'); },
   onResume() { this.speak('继续，加油！'); },
   onMinuteMark(mins) { if (mins > 0) this.speak(`还剩${mins}分钟`); },
   onCountdown(s) { if (!state.broadcastEnabled) return; this.speak(`${s}`); },
-  onFinish(name) { if (!state.broadcastEnabled) return; this.speak(`时间到！${name}太棒了，跳绳完成！`); },
+  onFinish(name) {
+    if (!state.broadcastEnabled) return;
+    if (state.accTotalRounds > 1) {
+      this.speak(`时间到！${name}太厉害了，${state.accTotalRounds}轮全部完成！你是真正的跳绳小达人！`);
+    } else {
+      this.speak(`时间到！${name}太棒了，跳绳完成！`);
+    }
+  },
 
   checkAndSpeak(remaining, total) {
     if (!state.broadcastEnabled) return;
@@ -1484,6 +1523,15 @@ const broadcast = {
       this._currentAudio.currentTime = 0;
       this._currentAudio = null;
     }
+    // 清理所有活跃的安全超时定时器
+    this._activeSafetyTimers.forEach(t => clearTimeout(t));
+    this._activeSafetyTimers = [];
+  },
+
+  /** 从追踪列表中移除已完成的安全超时 */
+  _removeSafetyTimer(timer) {
+    const idx = this._activeSafetyTimers.indexOf(timer);
+    if (idx !== -1) this._activeSafetyTimers.splice(idx, 1);
   }
 };
 
@@ -1525,7 +1573,7 @@ ringProgress.style.strokeDashoffset = '0';
 // ========== 时长选择 ==========
 document.querySelectorAll('.timer-opt').forEach(opt => {
   opt.addEventListener('click', function() {
-    if (state.isRunning || state.isResting || state.waitingNextRound) return;
+    if (state.isRunning || state.isResting || state.waitingNextRound || state.isSpeaking) return;
 
     // 移除所有 active
     document.querySelectorAll('.timer-opt').forEach(o => o.classList.remove('active'));
@@ -1551,7 +1599,7 @@ document.querySelectorAll('.timer-opt').forEach(opt => {
 $('customMinutes').addEventListener('input', function() {
   let val = parseInt(this.value);
   if (val > 120) { this.value = 120; val = 120; }
-  if (val > 0 && !state.isRunning && !state.isResting && !state.waitingNextRound) {
+  if (val > 0 && !state.isRunning && !state.isResting && !state.waitingNextRound && !state.isSpeaking) {
     setDuration(val);
   }
 });
@@ -1587,6 +1635,7 @@ let _tickExpectedTime = 0; // 下一次 tick 的预期时间戳
 
 function startTimer() {
   if (state.isFinished) return;
+  if (state.isSpeaking) return; // 播报等待中，禁止操作
 
   // 移动端浏览器要求首次语音播报必须在用户手势中触发，这里解锁
   broadcast.unlock();
@@ -1609,8 +1658,13 @@ function startTimer() {
     timerDisplay.classList.remove('resting');
     timerDisplay.classList.add('running');
     if (state.broadcastEnabled) bcStatusDot.classList.add('active');
-    setTimeout(() => broadcast.speak(`第${state.accCurrentRound}轮开始，加油！`), 100);
-    _startTick();
+    _enterSpeaking();
+    const token1 = ++state._speakCancelToken;
+    broadcast.speak(`第${state.accCurrentRound}轮开始，加油！`, () => {
+      _exitSpeaking();
+      if (state._speakCancelToken !== token1) return;
+      _startTick();
+    });
     return;
   }
 
@@ -1634,20 +1688,32 @@ function startTimer() {
   if (state.isPaused) {
     // 从暂停恢复
     state.isPaused = false;
-    setTimeout(() => broadcast.onResume(), 100);
-  } else {
-    // 全新开始
-    state.startTimestamp = new Date();
-    const activeOpt = document.querySelector('.timer-opt.active');
-    if (activeOpt && activeOpt.dataset.minutes === 'custom') {
-      const customVal = parseInt($('customMinutes').value);
-      if (!customVal || customVal <= 0) {
-        shakeElement($('customMinutes'));
-        return;
-      }
-      setDuration(customVal);
+    state.isRunning = true;
+    btnStart.innerHTML = '⏸ 暂停';
+    btnStart.className = 'btn btn-pause';
+    timeLabel.textContent = state.accTotalRounds > 1 ? `跳绳中... 第${state.accCurrentRound}/${state.accTotalRounds}轮` : '跳绳中...';
+    timerDisplay.classList.add('running');
+    if (state.broadcastEnabled) bcStatusDot.classList.add('active');
+    _enterSpeaking();
+    const token2 = ++state._speakCancelToken;
+    broadcast.speak('继续，加油！', () => {
+      _exitSpeaking();
+      if (state._speakCancelToken !== token2) return;
+      _startTick();
+    });
+    return;
+  }
+
+  // 全新开始
+  state.startTimestamp = new Date();
+  const activeOpt = document.querySelector('.timer-opt.active');
+  if (activeOpt && activeOpt.dataset.minutes === 'custom') {
+    const customVal = parseInt($('customMinutes').value);
+    if (!customVal || customVal <= 0) {
+      shakeElement($('customMinutes'));
+      return;
     }
-    setTimeout(() => broadcast.onStart(state.selectedMinutes), 100);
+    setDuration(customVal);
   }
 
   state.isRunning = true;
@@ -1657,8 +1723,13 @@ function startTimer() {
   timeLabel.textContent = state.accTotalRounds > 1 ? `跳绳中... 第${state.accCurrentRound}/${state.accTotalRounds}轮` : '跳绳中...';
   timerDisplay.classList.add('running');
   if (state.broadcastEnabled) bcStatusDot.classList.add('active');
-
-  _startTick();
+  _enterSpeaking();
+  const token3 = ++state._speakCancelToken;
+  broadcast.onStart(state.selectedMinutes, () => {
+    _exitSpeaking();
+    if (state._speakCancelToken !== token3) return;
+    _startTick();
+  });
 }
 
 /** 启动精准定时器（自校准） */
@@ -1666,6 +1737,24 @@ function _startTick() {
   _stopTick();
   _tickExpectedTime = Date.now() + 1000;
   state.timerId = setTimeout(_tickLoop, 1000);
+}
+
+/** 进入播报等待状态，禁用按钮并显示提示 */
+function _enterSpeaking() {
+  state.isSpeaking = true;
+  if (!state.broadcastEnabled) return; // 播报关闭时同步回调，无需改按钮
+  btnStart.disabled = true;
+  btnStart.dataset.prevText = btnStart.innerHTML;
+  btnStart.innerHTML = '🔊 播报中...';
+}
+
+/** 退出播报等待状态，恢复按钮 */
+function _exitSpeaking() {
+  state.isSpeaking = false;
+  if (!btnStart.dataset.prevText) return; // 播报关闭时未改按钮，无需恢复
+  btnStart.disabled = false;
+  btnStart.innerHTML = btnStart.dataset.prevText;
+  delete btnStart.dataset.prevText;
 }
 
 /** 停止定时器 */
@@ -1747,24 +1836,46 @@ function timerTick() {
           btnStart.innerHTML = '☕ 休息中';
           btnStart.className = 'btn btn-pause';
           btnStart.disabled = true;
-          broadcast.speak(`本轮结束，休息1分钟`);
-          const mins = Math.floor(state.restRemaining / 60);
-          const secs = state.restRemaining % 60;
-          timeDigits.textContent = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
-          ringProgress.style.strokeDashoffset = '0';
-          _startTick();
+          // 每轮结束激励播报：告知完成轮数和剩余轮数
+          const doneRounds1 = state.accCurrentRound;
+          const leftRounds1 = state.accTotalRounds - doneRounds1;
+          _enterSpeaking();
+          const tokenRest = ++state._speakCancelToken;
+          broadcast.speak(`${state.childName}太棒了！第${doneRounds1}轮完成！已经跳了${doneRounds1}轮，还剩${leftRounds1}轮，休息1分钟，继续加油！`, () => {
+            _exitSpeaking();
+            if (state._speakCancelToken !== tokenRest) return;
+            // 恢复休息中的按钮状态
+            btnStart.innerHTML = '☕ 休息中';
+            btnStart.className = 'btn btn-pause';
+            btnStart.disabled = true;
+            const mins = Math.floor(state.restRemaining / 60);
+            const secs = state.restRemaining % 60;
+            timeDigits.textContent = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+            ringProgress.style.strokeDashoffset = '0';
+            _startTick();
+          });
         } else {
           state.interruptsPerRound[state.accCurrentRound - 1] = state.interrupts;
+          // 每轮结束激励播报：告知完成轮数和剩余轮数
+          const doneRounds2 = state.accCurrentRound;
+          const leftRounds2 = state.accTotalRounds - doneRounds2;
           state.accCurrentRound++;
           state.interrupts = 0;
           interruptCountEl.textContent = '0';
           state.remainingSeconds = state.totalSeconds;
+          state.isRunning = false; // 播报期间暂时标记为非运行，防止 visibilitychange 误校准
           updateTimerDisplay();
           updateRing();
           updateAccDisplay();
-          broadcast.speak(`第${state.accCurrentRound}轮开始，加油！`);
+          _enterSpeaking();
+          const tokenNext = ++state._speakCancelToken;
+          broadcast.speak(`${state.childName}太棒了！第${doneRounds2}轮完成！已经跳了${doneRounds2}轮，还剩${leftRounds2}轮，第${state.accCurrentRound}轮开始，加油！`, () => {
+            _exitSpeaking();
+            if (state._speakCancelToken !== tokenNext) return;
+            state.isRunning = true;
+            _startTick();
+          });
           timeLabel.textContent = `跳绳中... 第${state.accCurrentRound}/${state.accTotalRounds}轮`;
-          _startTick();
         }
       } else {
         state.interruptsPerRound[state.accCurrentRound - 1] = state.interrupts;
@@ -1789,6 +1900,10 @@ function resetTimer() {
 
   // 停止所有音频播报
   broadcast.stopAll();
+  state._speakCancelToken++;  // 使所有等待中的播报回调失效
+  state.isSpeaking = false;
+  btnStart.disabled = false;
+  delete btnStart.dataset.prevText;
   bcStatusDot.classList.remove('active');
   timerDisplay.classList.remove('running');
   timerDisplay.classList.remove('resting');
@@ -1940,10 +2055,15 @@ function generateCard() {
   $('cardTime').textContent = timeStr;
   $('cardDuration').textContent = `${state.accTotalRounds * state.selectedMinutes} 分钟（${state.accTotalRounds}轮 × ${state.selectedMinutes}分钟）`;
   // 生成中断次数文本（每轮详情）
-  const totalInterrupts = state.interruptsPerRound.reduce((sum, n) => sum + n, 0);
+  const allInterrupts = state.interruptsPerRound.slice();
+  // 补上当前轮（未完成或刚完成但未记录的情况）
+  if (allInterrupts.length < state.accCurrentRound) {
+    allInterrupts.push(state.interrupts);
+  }
+  const totalInterrupts = allInterrupts.reduce((sum, n) => sum + n, 0);
   let interruptText = `${totalInterrupts} 次`;
-  if (state.accTotalRounds > 1 && state.interruptsPerRound.length > 0) {
-    const details = state.interruptsPerRound.map((n, i) => `第${i + 1}轮:${n}次`).join('，');
+  if (state.accTotalRounds > 1 && allInterrupts.length > 0) {
+    const details = allInterrupts.map((n, i) => `第${i + 1}轮:${n}次`).join('，');
     interruptText = `共${totalInterrupts}次（${details}）`;
   }
   $('cardInterrupt').textContent = interruptText;
@@ -2158,10 +2278,55 @@ function launchConfetti() {
 
 // ========== 累计倒计时轮数控制 ==========
 function changeAccRounds(delta) {
-  if (state.isRunning || state.isResting || state.waitingNextRound) return;
-  state.accTotalRounds = Math.max(1, state.accTotalRounds + delta);
-  state.accCurrentRound = 1;
+  if (state.isSpeaking) return;
+  // 运行中/休息中/等待下一轮时，允许调整但不能低于当前轮次
+  const minRounds = (state.isRunning || state.isResting || state.waitingNextRound || state.isPaused)
+    ? state.accCurrentRound
+    : 1;
+  const newTotal = Math.max(minRounds, state.accTotalRounds + delta);
+  if (newTotal === state.accTotalRounds) return;
+  state.accTotalRounds = newTotal;
+  // 非运行状态下重置当前轮为1
+  if (!state.isRunning && !state.isResting && !state.waitingNextRound && !state.isPaused) {
+    state.accCurrentRound = 1;
+  }
   updateAccDisplay();
+  // waitingNextRound 或 isResting 状态下，如果总轮数已减到当前轮，说明全部完成
+  if ((state.waitingNextRound || state.isResting) && state.accTotalRounds <= state.accCurrentRound) {
+    // 如果正在休息倒计时，先停掉
+    if (state.isResting) {
+      _stopTick();
+      state.isResting = false;
+      timerDisplay.classList.remove('resting');
+      $('restBadge').classList.remove('show');
+    }
+    state.waitingNextRound = false;
+    state.isFinished = true;
+    state.isRunning = false;
+    timeLabel.textContent = '🎉 完成！';
+    btnStart.innerHTML = '✅ 已完成';
+    btnStart.className = 'btn btn-start';
+    btnStart.disabled = true;
+    bcStatusDot.classList.remove('active');
+    broadcast.onFinish(state.childName);
+    launchConfetti();
+    return;
+  }
+  // 更新 timeLabel 显示最新轮数
+  if (state.isRunning || state.isPaused || state.isResting || state.waitingNextRound) {
+    if (state.isResting) {
+      timeLabel.textContent = `☕ 休息中... 下一轮：第${state.accCurrentRound + 1}轮`;
+    } else if (state.waitingNextRound) {
+      timeLabel.textContent = `☕ 休息结束，准备第${state.accCurrentRound + 1}轮`;
+      btnStart.innerHTML = `▶ 开始第${state.accCurrentRound + 1}轮`;
+    } else if (state.accTotalRounds > 1) {
+      timeLabel.textContent = state.isPaused
+        ? '已暂停'
+        : `跳绳中... 第${state.accCurrentRound}/${state.accTotalRounds}轮`;
+    } else {
+      timeLabel.textContent = state.isPaused ? '已暂停' : '跳绳中...';
+    }
+  }
 }
 
 function updateAccDisplay() {
@@ -2171,7 +2336,7 @@ function updateAccDisplay() {
 }
 
 function resetAccRounds() {
-  if (state.isRunning || state.isResting) return; // 运行中或休息中不允许重置
+  if (state.isRunning || state.isResting || state.isSpeaking) return; // 运行中、休息中或播报中不允许重置
   state.accCurrentRound = 1;
   state.accTotalRounds = 1;
   state.waitingNextRound = false;
