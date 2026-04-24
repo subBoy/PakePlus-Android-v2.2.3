@@ -1,11 +1,9 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>跳绳小达人 - 计时计数系统</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;700;800&family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 /* ========== CSS 变量 ========== */
 :root {
@@ -19,28 +17,41 @@
   --yellow: #FFE66D;
   --yellow-dark: #F5D442;
   --purple: #A78BFA;
-  --purple-light: #C4B5FD;
   --sky: #87CEEB;
   --dark: #2D3436;
   --dark-soft: #636E72;
   --white: #FFFFFF;
   --shadow-soft: 0 4px 20px rgba(0,0,0,0.08);
-  --shadow-medium: 0 8px 32px rgba(0,0,0,0.12);
   --shadow-heavy: 0 12px 48px rgba(0,0,0,0.16);
   --radius: 20px;
   --radius-sm: 12px;
   --radius-lg: 28px;
+  --font-base: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
 }
 
 /* ========== 基础重置 ========== */
 *, *::before, *::after {
   margin: 0; padding: 0; box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
 }
 
 html { font-size: 16px; scroll-behavior: smooth; }
 
+/* 移除所有可交互元素的点击聚焦框 */
+button, input, label, [onclick], .btn, .timer-opt, .toggle-wrap, .acc-btn, .interrupt-btn, .acc-reset-btn, .btn-save, .btn-close-modal {
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+}
+button:focus, input:focus, .btn:focus, .timer-opt:focus {
+  outline: none;
+}
+button:focus-visible, .btn:focus-visible {
+  outline: 2px solid var(--mint);
+  outline-offset: 2px;
+}
+
 body {
-  font-family: 'Quicksand', sans-serif;
+  font-family: var(--font-base);
   background: var(--cream);
   color: var(--dark);
   min-height: 100vh;
@@ -119,7 +130,6 @@ body::before {
   70% { transform: translateY(-8px); }
 }
 .header h1 {
-  font-family: 'Baloo 2', cursive;
   font-size: 2rem;
   font-weight: 800;
   background: linear-gradient(135deg, var(--coral), var(--purple));
@@ -157,7 +167,6 @@ body::before {
 }
 
 .card-title {
-  font-family: 'Baloo 2', cursive;
   font-size: 1.15rem;
   font-weight: 700;
   color: var(--dark);
@@ -220,7 +229,6 @@ body::before {
 
 .child-info { flex: 1; }
 .child-name {
-  font-family: 'Baloo 2', cursive;
   font-size: 1.4rem;
   font-weight: 700;
   color: var(--dark);
@@ -261,7 +269,6 @@ body::before {
   border: 2px solid #EEE;
   border-radius: var(--radius-sm);
   background: var(--white);
-  font-family: 'Baloo 2', cursive;
   font-size: 0.9rem;
   font-weight: 600;
   color: var(--dark-soft);
@@ -297,7 +304,6 @@ body::before {
   padding: 10px 14px;
   border: 2px solid #EEE;
   border-radius: var(--radius-sm);
-  font-family: 'Quicksand', sans-serif;
   font-size: 1rem;
   font-weight: 600;
   color: var(--dark);
@@ -351,7 +357,6 @@ body::before {
   text-align: center;
 }
 .timer-time .time-digits {
-  font-family: 'Baloo 2', cursive;
   font-size: 3.2rem;
   font-weight: 800;
   color: var(--dark);
@@ -414,7 +419,6 @@ body::before {
   text-align: center;
 }
 .interrupt-count .count-num {
-  font-family: 'Baloo 2', cursive;
   font-size: 2.4rem;
   font-weight: 800;
   color: var(--coral);
@@ -437,15 +441,19 @@ body::before {
   padding: 14px 32px;
   border: none;
   border-radius: 50px;
-  font-family: 'Baloo 2', cursive;
   font-size: 1.05rem;
   font-weight: 700;
   cursor: pointer;
   transition: all 0.25s ease;
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 8px;
   user-select: none;
+  white-space: nowrap;
+  flex-shrink: 1;
+  min-width: 0;
+  text-align: center;
 }
 .btn:active { transform: scale(0.95); }
 .btn-start {
@@ -516,25 +524,6 @@ body::before {
   to { opacity: 1; transform: scale(1) translateY(0); }
 }
 
-.modal-close {
-  position: absolute;
-  top: 12px;
-  right: 12px;
-  width: 32px;
-  height: 32px;
-  border: none;
-  background: rgba(255,255,255,0.8);
-  border-radius: 50%;
-  font-size: 1.1rem;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 2;
-  transition: all 0.2s;
-}
-.modal-close:hover { background: var(--white); transform: scale(1.1); }
-
 /* ========== 签名卡样式 ========== */
 .sign-card {
   position: relative;
@@ -559,7 +548,6 @@ body::before {
 }
 .sign-card-header .trophy { font-size: 48px; display: block; margin-bottom: 4px; }
 .sign-card-header h2 {
-  font-family: 'Baloo 2', cursive;
   font-size: 1.5rem;
   font-weight: 800;
   color: var(--white);
@@ -595,7 +583,6 @@ body::before {
   font-weight: 500;
 }
 .sign-card-row .row-value {
-  font-family: 'Baloo 2', cursive;
   font-size: 1.05rem;
   font-weight: 700;
   color: var(--dark);
@@ -619,7 +606,6 @@ body::before {
   padding: 6px 18px;
   border: 3px solid var(--mint);
   border-radius: 12px;
-  font-family: 'Baloo 2', cursive;
   font-size: 0.85rem;
   font-weight: 700;
   color: var(--mint-dark);
@@ -644,7 +630,6 @@ body::before {
   padding: 12px;
   border: none;
   border-radius: 50px;
-  font-family: 'Baloo 2', cursive;
   font-size: 0.95rem;
   font-weight: 700;
   cursor: pointer;
@@ -659,7 +644,6 @@ body::before {
   border: 2px solid #EEE;
   border-radius: 50px;
   background: var(--white);
-  font-family: 'Baloo 2', cursive;
   font-size: 0.95rem;
   font-weight: 700;
   color: var(--dark-soft);
@@ -674,7 +658,6 @@ body::before {
   text-align: center;
 }
 .edit-modal .modal-content h3 {
-  font-family: 'Baloo 2', cursive;
   font-size: 1.3rem;
   font-weight: 700;
   margin-bottom: 20px;
@@ -684,7 +667,6 @@ body::before {
   padding: 14px 18px;
   border: 2px solid #EEE;
   border-radius: var(--radius-sm);
-  font-family: 'Quicksand', sans-serif;
   font-size: 1.05rem;
   font-weight: 600;
   color: var(--dark);
@@ -729,13 +711,197 @@ body::before {
 /* ========== 隐藏文件输入 ========== */
 #avatarInput { display: none; }
 
-/* ========== 提示音效果 ========== */
-.flash {
-  animation: flash 0.5s ease;
+/* ========== 累计倒计时区域 ========== */
+.accumulate-section {
+  padding: 16px;
+  background: linear-gradient(135deg, #F0FFF4, #E8F5E9);
+  border-radius: var(--radius);
+  margin-bottom: 16px;
+  text-align: center;
 }
-@keyframes flash {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.5; }
+.acc-header {
+  margin-bottom: 12px;
+}
+.acc-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--dark);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+.acc-hint {
+  font-size: 0.7rem;
+  color: var(--dark-soft);
+  font-weight: 500;
+  margin-top: 2px;
+}
+.acc-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  margin: 8px 0;
+}
+.acc-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: none;
+  font-size: 1.3rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  font-weight: 700;
+}
+.acc-btn:active { transform: scale(0.92); }
+.acc-minus {
+  background: #C8E6C9;
+  color: var(--mint-dark);
+}
+.acc-minus:hover { background: #A5D6A7; }
+.acc-plus {
+  background: var(--mint);
+  color: var(--white);
+  box-shadow: 0 4px 12px rgba(78,205,196,0.35);
+}
+.acc-plus:hover { background: var(--mint-dark); }
+.acc-display {
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: var(--mint-dark);
+  display: flex;
+  align-items: baseline;
+  gap: 2px;
+}
+.acc-current {
+  font-size: 2rem;
+  color: var(--mint-dark);
+}
+.acc-sep {
+  font-size: 1.2rem;
+  color: var(--dark-soft);
+  margin: 0 2px;
+}
+.acc-total {
+  font-size: 1.4rem;
+  color: var(--dark-soft);
+}
+.acc-unit {
+  font-size: 0.85rem;
+  color: var(--dark-soft);
+  margin-left: 4px;
+}
+.acc-summary {
+  font-size: 0.8rem;
+  color: var(--dark-soft);
+  font-weight: 600;
+  margin-top: 4px;
+}
+.acc-summary strong {
+  color: var(--mint-dark);
+  font-size: 0.95rem;
+}
+.acc-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  transform: none !important;
+}
+.acc-reset-btn {
+  margin-top: 10px;
+  padding: 6px 18px;
+  border: 2px solid #C8E6C9;
+  border-radius: 50px;
+  background: var(--white);
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--mint-dark);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.acc-reset-btn:hover {
+  background: #E8F5E9;
+  transform: translateY(-1px);
+}
+.acc-reset-btn:active { transform: scale(0.95); }
+
+/* 轮间休息开关 */
+.rest-toggle-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 12px;
+  padding: 12px 16px;
+  background: rgba(255,255,255,0.7);
+  border-radius: var(--radius-sm);
+}
+.rest-toggle-row > div:first-child {
+  flex: 1;
+  min-width: 0;
+}
+.rest-toggle-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--dark);
+}
+.rest-toggle-info .rest-icon { font-size: 1.2rem; }
+.rest-toggle-hint {
+  font-size: 0.7rem;
+  color: var(--dark-soft);
+  font-weight: 500;
+}
+
+/* 休息状态下的环形颜色变化 */
+.timer-display.resting .timer-ring {
+  animation: pulse-rest 2s ease-in-out infinite;
+}
+@keyframes pulse-rest {
+  0%, 100% { filter: drop-shadow(0 0 0 transparent); }
+  50% { filter: drop-shadow(0 0 20px rgba(135,206,235,0.3)); }
+}
+.rest-badge {
+  display: none;
+  margin: 8px auto 0;
+  padding: 4px 16px;
+  background: linear-gradient(135deg, var(--sky), #60B5D1);
+  border-radius: 20px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--white);
+  text-align: center;
+  width: fit-content;
+  animation: fadeUp 0.3s ease;
+}
+.rest-badge.show { display: block; }
+
+/* 等待开始下一轮的按钮样式 */
+.btn-next-round {
+  background: linear-gradient(135deg, var(--sky), #60B5D1);
+  color: var(--white);
+  box-shadow: 0 6px 24px rgba(135,206,235,0.4);
+  animation: pulse-btn 1.5s ease-in-out infinite;
+}
+.btn-next-round:hover {
+  box-shadow: 0 8px 32px rgba(135,206,235,0.5);
+  transform: translateY(-2px);
+}
+@keyframes pulse-btn {
+  0%, 100% { box-shadow: 0 6px 24px rgba(135,206,235,0.4); }
+  50% { box-shadow: 0 6px 32px rgba(135,206,235,0.6); }
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-8px); }
+  40% { transform: translateX(8px); }
+  60% { transform: translateX(-4px); }
+  80% { transform: translateX(4px); }
 }
 
 /* ========== 播报开关 ========== */
@@ -752,7 +918,6 @@ body::before {
   display: flex;
   align-items: center;
   gap: 8px;
-  font-family: 'Baloo 2', cursive;
   font-size: 0.95rem;
   font-weight: 600;
   color: var(--dark);
@@ -854,7 +1019,7 @@ body::before {
       </div>
       <div class="child-info">
         <div class="child-name" onclick="openNameEditor()">
-          <span id="childName">小明</span>
+          <span id="childName">点击修改用户名</span>
           <span class="edit-hint">点击修改</span>
         </div>
         <div class="child-tag">⭐ 跳绳达人</div>
@@ -878,6 +1043,38 @@ body::before {
     <div class="custom-time-row" id="customTimeRow">
       <input type="number" class="custom-input" id="customMinutes" min="1" max="120" placeholder="输入分钟数" value="">
       <span class="custom-unit">分钟</span>
+    </div>
+
+    <!-- 累计倒计时次数 -->
+    <div class="accumulate-section" id="accumulateSection">
+      <div class="acc-header">
+        <div class="acc-title"><span class="icon">🔄</span> 累计倒计时</div>
+        <div class="acc-hint">设置连续跳绳轮数，每轮结束自动开始下一轮</div>
+      </div>
+      <div class="acc-controls">
+        <button class="acc-btn acc-minus" onclick="changeAccRounds(-1)" aria-label="减少轮数">−</button>
+        <div class="acc-display">
+          <span class="acc-current" id="accCurrent">1</span>
+          <span class="acc-sep">/</span>
+          <span class="acc-total" id="accTotal">1</span>
+          <span class="acc-unit">轮</span>
+        </div>
+        <button class="acc-btn acc-plus" onclick="changeAccRounds(1)" aria-label="增加轮数">＋</button>
+      </div>
+      <div class="acc-summary" id="accSummary">共计 <strong id="accTotalMinutes">1</strong> 分钟</div>
+      <button class="acc-reset-btn" id="accResetBtn" onclick="resetAccRounds()">↺ 重置轮数</button>
+      <div class="rest-toggle-row" id="restToggleRow">
+        <div>
+          <div class="rest-toggle-info">
+            <span class="rest-icon">☕</span> 轮间休息1分钟
+          </div>
+          <div class="rest-toggle-hint">每轮结束后休息1分钟，休息结束手动开始下一轮</div>
+        </div>
+        <label class="toggle-wrap">
+          <input type="checkbox" id="restToggle">
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
     </div>
 
     <!-- 语音播报开关 -->
@@ -915,6 +1112,7 @@ body::before {
         </div>
       </div>
     </div>
+    <div class="rest-badge" id="restBadge">☕ 休息中</div>
 
     <!-- 中断计数 -->
     <div class="interrupt-section">
@@ -951,7 +1149,7 @@ body::before {
         <div class="row-icon icon-child" id="cardAvatar">👦</div>
         <div>
           <div class="row-label">小达人</div>
-          <div class="row-value" id="cardChildName">小明</div>
+          <div class="row-value" id="cardChildName">点击修改用户名</div>
         </div>
       </div>
       <div class="sign-card-row">
@@ -1003,43 +1201,54 @@ body::before {
 <script>
 // ========== 状态管理 ==========
 const state = {
-  childName: localStorage.getItem('jump_childName') || '小明',
+  childName: localStorage.getItem('jump_childName') || '点击修改用户名',
   avatarSrc: localStorage.getItem('jump_avatarSrc') || null,
   selectedMinutes: 1,
   totalSeconds: 60,
   remainingSeconds: 60,
   interrupts: 0,
+  interruptsPerRound: [],  // 每轮中断次数记录，下标0=第1轮
   isRunning: false,
   isPaused: false,
   isFinished: false,
   timerId: null,
   startTimestamp: null,
   broadcastEnabled: true,
+  // 累计倒计时
+  accTotalRounds: 1,   // 总轮数
+  accCurrentRound: 1,  // 当前第几轮
+  // 轮间休息
+  restEnabled: false,       // 是否开启轮间休息
+  isResting: false,         // 当前是否在休息中
+  restSeconds: 60,          // 休息时长（秒）
+  restRemaining: 60,        // 休息剩余秒数
+  waitingNextRound: false,  // 休息结束，等待手动开始下一轮
+  isSpeaking: false,        // 播报等待中，防止重复点击
+  _speakCancelToken: 0,     // 播报取消令牌，resetTimer 时递增以丢弃过期回调
 };
 
-// ========== 语音播报模块（多引擎兼容方案） ==========
+// ========== 语音播报模块（PakePlus/WebView 兼容方案） ==========
+// 三层降级策略：
+// 1. Web Speech API（浏览器原生，WebView 通常不可用）
+// 2. 在线 TTS（直接通过 Audio 元素 src 加载，绕过 CORS 限制）
+// 3. 增强版蜂鸣音效（纯 Web Audio API，完全离线兜底）
 const broadcast = {
-  // AudioContext 实例，用于蜂鸣音兜底
   _audioCtx: null,
-  // 当前正在播放的 Audio 元素
   _currentAudio: null,
-  // 标记 AudioContext 是否已解锁
   _audioUnlocked: false,
-  // Web Speech API 是否可用（运行时检测）
-  _speechAvailable: false,
-  // 缓存中文语音
+  _speechTested: false,
+  _speechReallyWorks: false,
   _zhVoice: null,
+  _activeSafetyTimers: [],  // 追踪活跃的安全超时定时器
 
   /** 初始化 */
   init() {
-    // 检测 Web Speech API
     if ('speechSynthesis' in window) {
       const loadVoices = () => {
         const voices = window.speechSynthesis.getVoices();
         this._zhVoice = voices.find(v => v.lang === 'zh-CN')
           || voices.find(v => v.lang.startsWith('zh'))
           || null;
-        if (voices.length > 0) this._speechAvailable = true;
       };
       loadVoices();
       if (window.speechSynthesis.onvoiceschanged !== undefined) {
@@ -1048,81 +1257,209 @@ const broadcast = {
     }
   },
 
-  /**
-   * 在用户手势（点击）中调用，解锁移动端音频播放限制。
-   * 同时解锁 AudioContext 和 speechSynthesis。
-   */
+  /** 在用户手势中调用，解锁音频播放 */
   unlock() {
     if (this._audioUnlocked) return;
-    // 解锁 AudioContext（用于蜂鸣音兜底）
+    // 解锁 AudioContext
     try {
       const AudioCtx = window.AudioContext || window.webkitAudioContext;
       if (AudioCtx) {
         this._audioCtx = new AudioCtx();
-        // 播放一段极短的静音来解锁
         const buf = this._audioCtx.createBuffer(1, 1, 22050);
         const src = this._audioCtx.createBufferSource();
         src.buffer = buf;
         src.connect(this._audioCtx.destination);
         src.start(0);
       }
-    } catch(e) { /* 忽略 */ }
+    } catch(e) {}
+    // 解锁 Audio 元素
+    try {
+      const s = new Audio('data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQAAAAA=');
+      s.volume = 0;
+      s.play().catch(() => {});
+    } catch(e) {}
     // 解锁 speechSynthesis
     if ('speechSynthesis' in window) {
       try {
+        window.speechSynthesis.cancel(); // 先清空队列
         const u = new SpeechSynthesisUtterance('');
         u.volume = 0;
         u.lang = 'zh-CN';
         window.speechSynthesis.speak(u);
-      } catch(e) { /* 忽略 */ }
+        // 等空字符串播完后再测试，避免队列堆积
+        u.onend = () => { this._testSpeechSynthesis(); };
+        u.onerror = () => { this._testSpeechSynthesis(); };
+      } catch(e) {}
     }
-    // 解锁 Audio 元素播放
-    try {
-      const silentAudio = new Audio('data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQAAAAA=');
-      silentAudio.volume = 0;
-      silentAudio.play().catch(() => {});
-    } catch(e) { /* 忽略 */ }
     this._audioUnlocked = true;
   },
 
-  /**
-   * 核心播报方法 - 多引擎降级策略：
-   * 1. 优先尝试 Web Speech API
-   * 2. 失败则用蜂鸣音提示
-   */
-  speak(text) {
-    if (!state.broadcastEnabled) return;
-    // 方案1：Web Speech API
-    if (this._trySpeechSynthesis(text)) return;
-    // 方案2：蜂鸣音兜底（至少有声音提醒）
-    this._playBeep();
-  },
-
-  /** 尝试使用 Web Speech API */
-  _trySpeechSynthesis(text) {
-    if (!('speechSynthesis' in window)) return false;
+  /** 测试 speechSynthesis 是否真的能发声 */
+  _testSpeechSynthesis() {
+    if (this._speechTested || !('speechSynthesis' in window)) {
+      this._speechTested = true;
+      return;
+    }
     try {
-      window.speechSynthesis.cancel();
-      const utterance = new SpeechSynthesisUtterance(text);
-      utterance.lang = 'zh-CN';
-      utterance.rate = 1.05;
-      utterance.pitch = 1.1;
-      utterance.volume = 1;
-      if (this._zhVoice) utterance.voice = this._zhVoice;
-      // 监听是否真的能播放
-      let spoke = false;
-      utterance.onstart = () => { spoke = true; };
-      utterance.onerror = () => {
-        if (!spoke) this._playBeep();
-      };
-      window.speechSynthesis.speak(utterance);
-      return true;
+      const u = new SpeechSynthesisUtterance('测试');
+      u.lang = 'zh-CN';
+      u.volume = 0.01;
+      if (this._zhVoice) u.voice = this._zhVoice;
+      let started = false;
+      u.onstart = () => { started = true; this._speechReallyWorks = true; this._speechTested = true; };
+      u.onend = () => { if (!started) this._speechReallyWorks = false; this._speechTested = true; };
+      u.onerror = () => { this._speechReallyWorks = false; this._speechTested = true; };
+      setTimeout(() => { if (!this._speechTested) { this._speechReallyWorks = started; this._speechTested = true; } }, 2000);
+      window.speechSynthesis.speak(u);
     } catch(e) {
-      return false;
+      this._speechReallyWorks = false;
+      this._speechTested = true;
     }
   },
 
-  /** 使用 AudioContext 播放蜂鸣提示音 */
+  /**
+   * 核心播报 - 三层降级，返回 Promise，播报完成后 resolve
+   */
+  speak(text, callback) {
+    if (!state.broadcastEnabled) {
+      if (callback) callback();
+      return;
+    }
+    // 1. speechSynthesis（确认可用时，或测试尚未完成时乐观尝试）
+    if ((this._speechReallyWorks || !this._speechTested) && this._trySpeech(text, callback)) return;
+    // 2. 在线 TTS（Audio 元素直接加载 URL，不走 fetch，绕过 CORS）
+    this._playTTS(text, undefined, callback);
+  },
+
+  /** Web Speech API */
+  _trySpeech(text, callback) {
+    if (!('speechSynthesis' in window)) return false;
+    try {
+      window.speechSynthesis.cancel();
+      const u = new SpeechSynthesisUtterance(text);
+      u.lang = 'zh-CN';
+      u.rate = 1.05;
+      u.pitch = 1.1;
+      u.volume = 1;
+      if (this._zhVoice) u.voice = this._zhVoice;
+      let spoke = false;
+      let done = false;
+      let safetyTimer;
+      const finish = () => { if (!done) { done = true; clearTimeout(safetyTimer); this._removeSafetyTimer(safetyTimer); if (callback) callback(); } };
+      u.onstart = () => { spoke = true; };
+      u.onend = finish;
+      u.onerror = () => { if (!spoke) { clearTimeout(safetyTimer); this._removeSafetyTimer(safetyTimer); this._playTTS(text, undefined, callback); } else { finish(); } };
+      window.speechSynthesis.speak(u);
+      // 安全超时：防止 onend 永远不触发
+      safetyTimer = setTimeout(() => { finish(); }, 30000);
+      this._activeSafetyTimers.push(safetyTimer);
+      return true;
+    } catch(e) { return false; }
+  },
+
+  /**
+   * 在线 TTS - 多源轮换 + 故障自动切换
+   * 直接设置 Audio.src，不走 fetch，绕过 CORS
+   */
+  // 记录上次成功的 TTS 源索引，优先使用
+  _lastGoodTTS: 0,
+
+  /** 构建多个 TTS 源 URL */
+  _getTTSUrls(text) {
+    const encoded = encodeURIComponent(text);
+    return [
+      // 有道词典 TTS（中文支持好）
+      `https://dict.youdao.com/dictvoice?audio=${encoded}&le=zh`,
+      // 搜狗 TTS
+      `https://fanyi.sogou.com/reventondc/synthesis?text=${encoded}&speed=1&lang=zh-CHS&from=translateweb&speaker=6`,
+      // 百度翻译 TTS
+      `https://fanyi.baidu.com/gettts?lan=zh&text=${encoded}&spd=5&source=web`,
+    ];
+  },
+
+  _playTTS(text, triedIndices, callback) {
+    const urls = this._getTTSUrls(text);
+    const tried = triedIndices || [];
+
+    // 确定本次尝试的索引：优先用上次成功的源，否则按顺序找未试过的
+    let idx = -1;
+    if (tried.length === 0 && this._lastGoodTTS < urls.length) {
+      idx = this._lastGoodTTS;
+    } else {
+      for (let i = 0; i < urls.length; i++) {
+        if (tried.indexOf(i) === -1) { idx = i; break; }
+      }
+    }
+
+    // 所有源都试过了，降级蜂鸣音
+    if (idx === -1) {
+      this._playContextBeep(text);
+      if (callback) callback();
+      return;
+    }
+
+    tried.push(idx);
+    const url = urls[idx];
+
+    try {
+      if (this._currentAudio) {
+        this._currentAudio.pause();
+        this._currentAudio.currentTime = 0;
+      }
+      const audio = new Audio();
+      this._currentAudio = audio;
+      audio.volume = 1;
+      let playing = false;
+      let fellBack = false;
+      let cbCalled = false;
+      let safetyTimeout = null;
+      const callCb = () => { if (!cbCalled) { cbCalled = true; clearTimeout(safetyTimeout); this._removeSafetyTimer(safetyTimeout); if (callback) callback(); } };
+      const tryNext = () => {
+        if (fellBack) return;
+        fellBack = true;
+        clearTimeout(timeout);
+        if (safetyTimeout) { clearTimeout(safetyTimeout); this._removeSafetyTimer(safetyTimeout); }
+        this._playTTS(text, tried, callback);
+      };
+      audio.onerror = () => {
+        if (playing) { clearTimeout(timeout); callCb(); } // 已开始播放后出错，视为播完
+        else { tryNext(); }
+      };
+      audio.onplay = () => {
+        playing = true;
+        this._lastGoodTTS = idx;
+        // 安全超时：音频开始播放后最多等30秒，防止 onended 不触发导致卡死
+        safetyTimeout = setTimeout(() => { callCb(); }, 30000);
+        this._activeSafetyTimers.push(safetyTimeout);
+      };
+      const timeout = setTimeout(() => { if (!playing) tryNext(); }, 3000);
+      audio.onended = () => { clearTimeout(timeout); callCb(); };
+      audio.src = url;
+      audio.play().catch(() => { tryNext(); });
+    } catch(e) {
+      this._playTTS(text, tried, callback);
+    }
+  },
+
+  /** 根据内容选择蜂鸣音效 */
+  _playContextBeep(text) {
+    if (text.includes('开始') || text.includes('加油')) {
+      this._playDoubleBeep();
+    } else if (text.includes('时间到') || text.includes('完成')) {
+      this._playFinishSound();
+    } else if (text.includes('暂停')) {
+      this._playBeep(660, 0.3);
+    } else if (text.includes('冲刺')) {
+      this._playTripleBeep();
+    } else if (/^\d+$/.test(text)) {
+      const num = parseInt(text);
+      this._playBeep(600 + (10 - num) * 60, 0.12);
+    } else {
+      this._playBeep();
+    }
+  },
+
+  /** AudioContext 蜂鸣音 */
   _playBeep(freq = 880, duration = 0.15) {
     try {
       const ctx = this._audioCtx;
@@ -1138,80 +1475,63 @@ const broadcast = {
       gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + duration);
       osc.start(ctx.currentTime);
       osc.stop(ctx.currentTime + duration);
-    } catch(e) { /* 忽略 */ }
+    } catch(e) {}
   },
 
-  /** 播放双音提示（用于重要节点，如开始/结束） */
   _playDoubleBeep() {
     this._playBeep(880, 0.15);
     setTimeout(() => this._playBeep(1100, 0.2), 200);
   },
 
-  /** 播放完成音效（三连音） */
+  _playTripleBeep() {
+    this._playBeep(800, 0.1);
+    setTimeout(() => this._playBeep(1000, 0.1), 150);
+    setTimeout(() => this._playBeep(1200, 0.15), 300);
+  },
+
   _playFinishSound() {
     this._playBeep(880, 0.12);
     setTimeout(() => this._playBeep(1100, 0.12), 150);
     setTimeout(() => this._playBeep(1320, 0.25), 300);
   },
 
-  /** 开始计时播报 */
-  onStart(minutes) {
-    this.speak(`计时开始，${minutes}分钟跳绳，加油！`);
-  },
-
-  /** 暂停播报 */
-  onPause() {
-    this.speak('已暂停');
-  },
-
-  /** 继续播报 */
-  onResume() {
-    this.speak('继续，加油！');
-  },
-
-  /** 每分钟播报 */
-  onMinuteMark(remainingMins) {
-    if (remainingMins > 0) {
-      this.speak(`还剩${remainingMins}分钟`);
-    }
-  },
-
-  /** 最后10秒倒数播报 */
-  onCountdown(seconds) {
-    // 倒计时用语音说数字，如果语音不可用则用蜂鸣
-    if (!state.broadcastEnabled) return;
-    if (!this._trySpeechSynthesis(`${seconds}`)) {
-      // 蜂鸣音频率随倒计时升高，营造紧迫感
-      const freq = 600 + (10 - seconds) * 60;
-      this._playBeep(freq, 0.1);
-    }
-  },
-
-  /** 完成播报 */
+  onStart(minutes, callback) { this.speak(`计时开始，${minutes}分钟跳绳，加油！`, callback); },
+  onPause() { this.speak('已暂停'); },
+  onResume() { this.speak('继续，加油！'); },
+  onMinuteMark(mins) { if (mins > 0) this.speak(`还剩${mins}分钟`); },
+  onCountdown(s) { if (!state.broadcastEnabled) return; this.speak(`${s}`); },
   onFinish(name) {
     if (!state.broadcastEnabled) return;
-    if (!this._trySpeechSynthesis(`时间到！${name}太棒了，跳绳完成！`)) {
-      this._playFinishSound();
+    if (state.accTotalRounds > 1) {
+      this.speak(`时间到！${name}太厉害了，${state.accTotalRounds}轮全部完成！你是真正的跳绳小达人！`);
+    } else {
+      this.speak(`时间到！${name}太棒了，跳绳完成！`);
     }
   },
 
-  /** 根据剩余秒数判断是否需要播报 */
   checkAndSpeak(remaining, total) {
     if (!state.broadcastEnabled) return;
-    // 最后10秒逐秒倒数
-    if (remaining <= 10 && remaining > 0) {
-      this.onCountdown(remaining);
-      return;
+    if (remaining <= 10 && remaining > 0) { this.onCountdown(remaining); return; }
+    if (remaining === 30 && total > 30) { this.speak('还剩30秒，冲刺！'); return; }
+    if (remaining > 0 && remaining % 60 === 0) { this.onMinuteMark(remaining / 60); }
+  },
+
+  stopAll() {
+    try { window.speechSynthesis && window.speechSynthesis.cancel(); } catch(e) {}
+    if (this._currentAudio) {
+      this._currentAudio.pause();
+      this._currentAudio.currentTime = 0;
+      this._currentAudio = null;
     }
-    // 最后30秒提醒（仅一次）
-    if (remaining === 30 && total > 30) {
-      this.speak('还剩30秒，冲刺！');
-      return;
-    }
-    // 每分钟整点播报
-    if (remaining > 0 && remaining % 60 === 0) {
-      this.onMinuteMark(remaining / 60);
-    }
+    // 清理所有活跃的安全超时定时器
+    this._activeSafetyTimers.forEach(t => clearTimeout(t));
+    this._activeSafetyTimers = [];
+  },
+
+  /** 从追踪列表中移除已完成的安全超时 */
+  _removeSafetyTimer(timer) {
+    const idx = this._activeSafetyTimers.indexOf(timer);
+    if (idx !== -1) this._activeSafetyTimers.splice(idx, 1);
   }
 };
 
@@ -1221,18 +1541,19 @@ const bcStatusDot = document.getElementById('bcStatus');
 bcToggle.addEventListener('change', function() {
   state.broadcastEnabled = this.checked;
   if (!this.checked) {
-    // 停止所有音频
-    window.speechSynthesis && window.speechSynthesis.cancel();
-    if (broadcast._currentAudio) {
-      broadcast._currentAudio.pause();
-      broadcast._currentAudio = null;
-    }
+    broadcast.stopAll();
     bcStatusDot.classList.remove('active');
   }
 });
 
 // 初始化语音模块
 broadcast.init();
+
+// 休息开关事件
+const restToggle = document.getElementById('restToggle');
+restToggle.addEventListener('change', function() {
+  state.restEnabled = this.checked;
+});
 
 // ========== DOM 引用 ==========
 const $ = (id) => document.getElementById(id);
@@ -1252,7 +1573,7 @@ ringProgress.style.strokeDashoffset = '0';
 // ========== 时长选择 ==========
 document.querySelectorAll('.timer-opt').forEach(opt => {
   opt.addEventListener('click', function() {
-    if (state.isRunning) return; // 运行中不允许切换
+    if (state.isRunning || state.isResting || state.waitingNextRound || state.isSpeaking) return;
 
     // 移除所有 active
     document.querySelectorAll('.timer-opt').forEach(o => o.classList.remove('active'));
@@ -1278,7 +1599,7 @@ document.querySelectorAll('.timer-opt').forEach(opt => {
 $('customMinutes').addEventListener('input', function() {
   let val = parseInt(this.value);
   if (val > 120) { this.value = 120; val = 120; }
-  if (val > 0 && !state.isRunning) {
+  if (val > 0 && !state.isRunning && !state.isResting && !state.waitingNextRound && !state.isSpeaking) {
     setDuration(val);
   }
 });
@@ -1291,6 +1612,7 @@ function setDuration(minutes) {
   state.isFinished = false;
   updateTimerDisplay();
   updateRing();
+  updateAccDisplay();
   timeLabel.textContent = '准备开始';
 }
 
@@ -1308,111 +1630,326 @@ function updateRing() {
 }
 
 // ========== 计时器控制 ==========
+// 用真实时间校准，避免手机切后台/锁屏时 setInterval 漂移
+let _tickExpectedTime = 0; // 下一次 tick 的预期时间戳
+
 function startTimer() {
   if (state.isFinished) return;
+  if (state.isSpeaking) return; // 播报等待中，禁止操作
 
   // 移动端浏览器要求首次语音播报必须在用户手势中触发，这里解锁
   broadcast.unlock();
 
+  // 休息结束后手动开始下一轮
+  if (state.waitingNextRound) {
+    state.waitingNextRound = false;
+    state.accCurrentRound++;
+    state.interrupts = 0;
+    interruptCountEl.textContent = '0';
+    state.remainingSeconds = state.totalSeconds;
+    state.isRunning = true;
+    state.isPaused = false;
+    updateTimerDisplay();
+    updateRing();
+    updateAccDisplay();
+    btnStart.innerHTML = '⏸ 暂停';
+    btnStart.className = 'btn btn-pause';
+    timeLabel.textContent = `跳绳中... 第${state.accCurrentRound}/${state.accTotalRounds}轮`;
+    timerDisplay.classList.remove('resting');
+    timerDisplay.classList.add('running');
+    if (state.broadcastEnabled) bcStatusDot.classList.add('active');
+    _enterSpeaking();
+    const token1 = ++state._speakCancelToken;
+    broadcast.speak(`第${state.accCurrentRound}轮开始，加油！`, () => {
+      _exitSpeaking();
+      if (state._speakCancelToken !== token1) return;
+      _startTick();
+    });
+    return;
+  }
+
   if (state.isRunning && !state.isPaused) {
-    // 暂停
+    // 暂停 - 自动加一次中断次数
     state.isPaused = true;
-    clearInterval(state.timerId);
-    state.timerId = null;
+    _stopTick();
+    state.interrupts++;
+    interruptCountEl.textContent = state.interrupts;
+    interruptCountEl.style.transform = 'scale(1.3)';
+    setTimeout(() => { interruptCountEl.style.transform = 'scale(1)'; }, 200);
     btnStart.innerHTML = '▶ 继续';
     btnStart.className = 'btn btn-start';
     timeLabel.textContent = '已暂停';
     timerDisplay.classList.remove('running');
     bcStatusDot.classList.remove('active');
-    broadcast.onPause();
+    setTimeout(() => broadcast.onPause(), 100);
     return;
   }
 
   if (state.isPaused) {
     // 从暂停恢复
     state.isPaused = false;
-    broadcast.onResume();
-  } else {
-    // 全新开始
-    state.startTimestamp = new Date();
-    // 确保自定义时间已设置
-    const activeOpt = document.querySelector('.timer-opt.active');
-    if (activeOpt && activeOpt.dataset.minutes === 'custom') {
-      const customVal = parseInt($('customMinutes').value);
-      if (!customVal || customVal <= 0) {
-        shakeElement($('customMinutes'));
-        return;
-      }
-      setDuration(customVal);
+    state.isRunning = true;
+    btnStart.innerHTML = '⏸ 暂停';
+    btnStart.className = 'btn btn-pause';
+    timeLabel.textContent = state.accTotalRounds > 1 ? `跳绳中... 第${state.accCurrentRound}/${state.accTotalRounds}轮` : '跳绳中...';
+    timerDisplay.classList.add('running');
+    if (state.broadcastEnabled) bcStatusDot.classList.add('active');
+    _enterSpeaking();
+    const token2 = ++state._speakCancelToken;
+    broadcast.speak('继续，加油！', () => {
+      _exitSpeaking();
+      if (state._speakCancelToken !== token2) return;
+      _startTick();
+    });
+    return;
+  }
+
+  // 全新开始
+  state.startTimestamp = new Date();
+  const activeOpt = document.querySelector('.timer-opt.active');
+  if (activeOpt && activeOpt.dataset.minutes === 'custom') {
+    const customVal = parseInt($('customMinutes').value);
+    if (!customVal || customVal <= 0) {
+      shakeElement($('customMinutes'));
+      return;
     }
-    broadcast.onStart(state.selectedMinutes);
+    setDuration(customVal);
   }
 
   state.isRunning = true;
   state.isPaused = false;
   btnStart.innerHTML = '⏸ 暂停';
   btnStart.className = 'btn btn-pause';
-  timeLabel.textContent = '跳绳中...';
+  timeLabel.textContent = state.accTotalRounds > 1 ? `跳绳中... 第${state.accCurrentRound}/${state.accTotalRounds}轮` : '跳绳中...';
   timerDisplay.classList.add('running');
   if (state.broadcastEnabled) bcStatusDot.classList.add('active');
+  _enterSpeaking();
+  const token3 = ++state._speakCancelToken;
+  broadcast.onStart(state.selectedMinutes, () => {
+    _exitSpeaking();
+    if (state._speakCancelToken !== token3) return;
+    _startTick();
+  });
+}
 
-  state.timerId = setInterval(() => {
+/** 启动精准定时器（自校准） */
+function _startTick() {
+  _stopTick();
+  _tickExpectedTime = Date.now() + 1000;
+  state.timerId = setTimeout(_tickLoop, 1000);
+}
+
+/** 进入播报等待状态，禁用按钮并显示提示 */
+function _enterSpeaking() {
+  state.isSpeaking = true;
+  if (!state.broadcastEnabled) return; // 播报关闭时同步回调，无需改按钮
+  btnStart.disabled = true;
+  btnStart.dataset.prevText = btnStart.innerHTML;
+  btnStart.innerHTML = '🔊 播报中...';
+}
+
+/** 退出播报等待状态，恢复按钮 */
+function _exitSpeaking() {
+  state.isSpeaking = false;
+  if (!btnStart.dataset.prevText) return; // 播报关闭时未改按钮，无需恢复
+  btnStart.disabled = false;
+  btnStart.innerHTML = btnStart.dataset.prevText;
+  delete btnStart.dataset.prevText;
+}
+
+/** 停止定时器 */
+function _stopTick() {
+  if (state.timerId) {
+    clearTimeout(state.timerId);
+    state.timerId = null;
+  }
+}
+
+/** 自校准 tick 循环：根据真实时间差补偿漂移 */
+function _tickLoop() {
+  const drift = Date.now() - _tickExpectedTime;
+  // 先记录当前 timerId，timerTick 内部可能会 _stopTick + _startTick
+  const prevId = state.timerId;
+  timerTick();
+  // 只有当 timerTick 没有重新启动定时器（timerId 未变或被清空）时，才安排下一次
+  // 如果 timerTick 内部调用了 _startTick（轮次切换），新的 tick 循环已经启动，不需要再安排
+  if (state.timerId === prevId && state.timerId !== null) {
+    _tickExpectedTime += 1000;
+    state.timerId = setTimeout(_tickLoop, Math.max(0, 1000 - drift));
+  }
+}
+
+function timerTick() {
+    // 休息倒计时模式
+    if (state.isResting) {
+      state.restRemaining--;
+      const mins = Math.floor(state.restRemaining / 60);
+      const secs = state.restRemaining % 60;
+      timeDigits.textContent = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+      const progress = state.restRemaining / state.restSeconds;
+      const offset = circumference * (1 - progress);
+      ringProgress.style.strokeDashoffset = offset;
+
+      if (state.restRemaining <= 5 && state.restRemaining > 0) {
+        broadcast.onCountdown(state.restRemaining);
+      }
+
+      if (state.restRemaining <= 0) {
+        _stopTick();
+        state.isResting = false;
+        state.waitingNextRound = true;
+        state.isRunning = false;
+        timerDisplay.classList.remove('resting');
+        $('restBadge').classList.remove('show');
+        timeLabel.textContent = `☕ 休息结束，准备第${state.accCurrentRound + 1}轮`;
+        btnStart.innerHTML = `▶ 开始第${state.accCurrentRound + 1}轮`;
+        btnStart.className = 'btn btn-next-round';
+        btnStart.disabled = false;
+        broadcast.speak(`休息结束，准备开始第${state.accCurrentRound + 1}轮`);
+      }
+      return;
+    }
+
+    // 正常跳绳倒计时
     state.remainingSeconds--;
     updateTimerDisplay();
     updateRing();
 
-    // iOS Safari 会在后台挂起 speechSynthesis，定期 resume 保持活跃
     if (window.speechSynthesis && window.speechSynthesis.speaking) {
       window.speechSynthesis.resume();
     }
 
-    // 语音播报检查
     broadcast.checkAndSpeak(state.remainingSeconds, state.totalSeconds);
 
     if (state.remainingSeconds <= 0) {
-      // 计时结束
-      clearInterval(state.timerId);
-      state.timerId = null;
-      state.isRunning = false;
-      state.isFinished = true;
-      timeLabel.textContent = '🎉 完成！';
-      timerDisplay.classList.remove('running');
-      bcStatusDot.classList.remove('active');
-      btnStart.innerHTML = '✅ 已完成';
-      btnStart.className = 'btn btn-start';
-      btnStart.disabled = true;
-      broadcast.onFinish(state.childName);
-      launchConfetti();
+      _stopTick();
+
+      if (state.accCurrentRound < state.accTotalRounds) {
+        if (state.restEnabled) {
+          state.interruptsPerRound[state.accCurrentRound - 1] = state.interrupts;
+          state.isResting = true;
+          state.restRemaining = state.restSeconds;
+          timerDisplay.classList.remove('running');
+          timerDisplay.classList.add('resting');
+          $('restBadge').classList.add('show');
+          timeLabel.textContent = `☕ 休息中... 下一轮：第${state.accCurrentRound + 1}轮`;
+          btnStart.innerHTML = '☕ 休息中';
+          btnStart.className = 'btn btn-pause';
+          btnStart.disabled = true;
+          // 每轮结束激励播报：告知完成轮数和剩余轮数
+          const doneRounds1 = state.accCurrentRound;
+          const leftRounds1 = state.accTotalRounds - doneRounds1;
+          _enterSpeaking();
+          const tokenRest = ++state._speakCancelToken;
+          broadcast.speak(`${state.childName}太棒了！第${doneRounds1}轮完成！已经跳了${doneRounds1}轮，还剩${leftRounds1}轮，休息1分钟，继续加油！`, () => {
+            _exitSpeaking();
+            if (state._speakCancelToken !== tokenRest) return;
+            // 恢复休息中的按钮状态
+            btnStart.innerHTML = '☕ 休息中';
+            btnStart.className = 'btn btn-pause';
+            btnStart.disabled = true;
+            const mins = Math.floor(state.restRemaining / 60);
+            const secs = state.restRemaining % 60;
+            timeDigits.textContent = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+            ringProgress.style.strokeDashoffset = '0';
+            _startTick();
+          });
+        } else {
+          state.interruptsPerRound[state.accCurrentRound - 1] = state.interrupts;
+          // 每轮结束激励播报：告知完成轮数和剩余轮数
+          const doneRounds2 = state.accCurrentRound;
+          const leftRounds2 = state.accTotalRounds - doneRounds2;
+          state.accCurrentRound++;
+          state.interrupts = 0;
+          interruptCountEl.textContent = '0';
+          state.remainingSeconds = state.totalSeconds;
+          state.isRunning = false; // 播报期间暂时标记为非运行，防止 visibilitychange 误校准
+          updateTimerDisplay();
+          updateRing();
+          updateAccDisplay();
+          _enterSpeaking();
+          const tokenNext = ++state._speakCancelToken;
+          broadcast.speak(`${state.childName}太棒了！第${doneRounds2}轮完成！已经跳了${doneRounds2}轮，还剩${leftRounds2}轮，第${state.accCurrentRound}轮开始，加油！`, () => {
+            _exitSpeaking();
+            if (state._speakCancelToken !== tokenNext) return;
+            state.isRunning = true;
+            _startTick();
+          });
+          timeLabel.textContent = `跳绳中... 第${state.accCurrentRound}/${state.accTotalRounds}轮`;
+        }
+      } else {
+        state.interruptsPerRound[state.accCurrentRound - 1] = state.interrupts;
+        state.isRunning = false;
+        state.isFinished = true;
+        timeLabel.textContent = '🎉 完成！';
+        timerDisplay.classList.remove('running');
+        bcStatusDot.classList.remove('active');
+        btnStart.innerHTML = '✅ 已完成';
+        btnStart.className = 'btn btn-start';
+        btnStart.disabled = true;
+        broadcast.onFinish(state.childName);
+        launchConfetti();
+      }
     }
-  }, 1000);
 }
 
 function resetTimer() {
-  clearInterval(state.timerId);
-  state.timerId = null;
+  const wasResting = state.isResting;
+
+  _stopTick();
+
+  // 停止所有音频播报
+  broadcast.stopAll();
+  state._speakCancelToken++;  // 使所有等待中的播报回调失效
+  state.isSpeaking = false;
+  btnStart.disabled = false;
+  delete btnStart.dataset.prevText;
+  bcStatusDot.classList.remove('active');
+  timerDisplay.classList.remove('running');
+  timerDisplay.classList.remove('resting');
+  $('restBadge').classList.remove('show');
+
+  // 公共状态重置
   state.isRunning = false;
   state.isPaused = false;
   state.isFinished = false;
-  state.interrupts = 0;
-  state.remainingSeconds = state.totalSeconds;
-  state.startTimestamp = null;
+  state.isResting = false;
+  state.restRemaining = state.restSeconds;
+  state.waitingNextRound = false;
 
-  // 停止所有音频播报
-  window.speechSynthesis && window.speechSynthesis.cancel();
-  if (broadcast._currentAudio) {
-    broadcast._currentAudio.pause();
-    broadcast._currentAudio = null;
+  if (wasResting && state.accCurrentRound < state.accTotalRounds) {
+    // 休息倒计时中重置 → 进入下一轮的准备状态
+    // 当前轮中断已在进入休息时保存，新轮中断归零
+    state.interrupts = 0;
+    interruptCountEl.textContent = '0';
+    state.accCurrentRound++;
+    state.remainingSeconds = state.totalSeconds;
+    updateTimerDisplay();
+    updateRing();
+    updateAccDisplay();
+    timeLabel.textContent = `准备开始第${state.accCurrentRound}轮`;
+    btnStart.innerHTML = `▶ 开始第${state.accCurrentRound}轮`;
+    btnStart.className = 'btn btn-next-round';
+    btnStart.disabled = false;
+  } else {
+    // 跳绳倒计时中重置（或其他状态） → 重置为当前轮的初始状态
+    state.interrupts = 0;
+    interruptCountEl.textContent = '0';
+    state.remainingSeconds = state.totalSeconds;
+    state.startTimestamp = null;
+    updateTimerDisplay();
+    updateRing();
+    updateAccDisplay();
+    if (state.accTotalRounds > 1) {
+      timeLabel.textContent = `准备开始第${state.accCurrentRound}轮`;
+      btnStart.innerHTML = `▶ 开始第${state.accCurrentRound}轮`;
+    } else {
+      timeLabel.textContent = '准备开始';
+      btnStart.innerHTML = '▶ 开始';
+    }
+    btnStart.className = 'btn btn-start';
+    btnStart.disabled = false;
   }
-  bcStatusDot.classList.remove('active');
-
-  updateTimerDisplay();
-  updateRing();
-  interruptCountEl.textContent = '0';
-  timeLabel.textContent = '准备开始';
-  timerDisplay.classList.remove('running');
-  btnStart.innerHTML = '▶ 开始';
-  btnStart.className = 'btn btn-start';
-  btnStart.disabled = false;
 }
 
 // ========== 中断计数 ==========
@@ -1432,17 +1969,46 @@ function openAvatarPicker() {
 function handleAvatarChange(event) {
   const file = event.target.files[0];
   if (!file) return;
-  // 验证文件类型
   if (!file.type.startsWith('image/')) return;
 
   const reader = new FileReader();
   reader.onload = function(e) {
-    state.avatarSrc = e.target.result;
-    const avatarEl = $('avatarDisplay');
-    avatarEl.innerHTML = `<img src="${e.target.result}" alt="头像">`;
-    localStorage.setItem('jump_avatarSrc', e.target.result);
+    // 压缩头像到 200x200，减少 localStorage 占用
+    const img = new Image();
+    img.onload = function() {
+      const canvas = document.createElement('canvas');
+      const size = 200;
+      canvas.width = size;
+      canvas.height = size;
+      const ctx = canvas.getContext('2d');
+      // 居中裁剪为正方形
+      const min = Math.min(img.width, img.height);
+      const sx = (img.width - min) / 2;
+      const sy = (img.height - min) / 2;
+      ctx.drawImage(img, sx, sy, min, min, 0, 0, size, size);
+      const compressed = canvas.toDataURL('image/jpeg', 0.8);
+      state.avatarSrc = compressed;
+      setAvatarImg($('avatarDisplay'), compressed);
+      localStorage.setItem('jump_avatarSrc', compressed);
+    };
+    img.onerror = function() {
+      // 压缩失败，直接用原图
+      state.avatarSrc = e.target.result;
+      setAvatarImg($('avatarDisplay'), e.target.result);
+      localStorage.setItem('jump_avatarSrc', e.target.result);
+    };
+    img.src = e.target.result;
   };
   reader.readAsDataURL(file);
+}
+
+/** 安全设置头像图片（DOM API，避免 innerHTML） */
+function setAvatarImg(container, src) {
+  container.textContent = '';
+  const img = document.createElement('img');
+  img.src = src;
+  img.alt = '头像';
+  container.appendChild(img);
 }
 
 function openNameEditor() {
@@ -1480,15 +2046,27 @@ function generateCard() {
   // 同步头像到签名卡
   const cardAvatarEl = $('cardAvatar');
   if (state.avatarSrc) {
-    cardAvatarEl.innerHTML = `<img src="${state.avatarSrc}" alt="头像">`;
+    setAvatarImg(cardAvatarEl, state.avatarSrc);
   } else {
     cardAvatarEl.textContent = '👦';
   }
 
   $('cardChildName').textContent = state.childName;
   $('cardTime').textContent = timeStr;
-  $('cardDuration').textContent = `${state.selectedMinutes} 分钟`;
-  $('cardInterrupt').textContent = `${state.interrupts} 次`;
+  $('cardDuration').textContent = `${state.accTotalRounds * state.selectedMinutes} 分钟（${state.accTotalRounds}轮 × ${state.selectedMinutes}分钟）`;
+  // 生成中断次数文本（每轮详情）
+  const allInterrupts = state.interruptsPerRound.slice();
+  // 补上当前轮（未完成或刚完成但未记录的情况）
+  if (allInterrupts.length < state.accCurrentRound) {
+    allInterrupts.push(state.interrupts);
+  }
+  const totalInterrupts = allInterrupts.reduce((sum, n) => sum + n, 0);
+  let interruptText = `${totalInterrupts} 次`;
+  if (state.accTotalRounds > 1 && allInterrupts.length > 0) {
+    const details = allInterrupts.map((n, i) => `第${i + 1}轮:${n}次`).join('，');
+    interruptText = `共${totalInterrupts}次（${details}）`;
+  }
+  $('cardInterrupt').textContent = interruptText;
 
   $('cardModal').classList.add('show');
 }
@@ -1523,18 +2101,18 @@ function saveCard() {
 
     // 头部文字
     ctx.fillStyle = '#FFFFFF';
-    ctx.font = '36px "Baloo 2", sans-serif';
+    ctx.font = '36px sans-serif';
     ctx.textAlign = 'center';
     ctx.fillText('🏆', w / 2, 55);
-    ctx.font = 'bold 26px "Baloo 2", sans-serif';
+    ctx.font = 'bold 26px sans-serif';
     ctx.fillText('跳绳达人签名卡', w / 2, 100);
 
     // 信息区域
     const rows = [
       { icon: '👦', label: '小达人', value: state.childName, isAvatar: true },
       { icon: '📅', label: '完成时间', value: $('cardTime').textContent },
-      { icon: '⏱️', label: '跳绳时长', value: `${state.selectedMinutes} 分钟` },
-      { icon: '🔔', label: '中断次数', value: `${state.interrupts} 次` },
+      { icon: '⏱️', label: '跳绳时长', value: `${state.accTotalRounds * state.selectedMinutes} 分钟（${state.accTotalRounds}轮）` },
+      { icon: '🔔', label: '中断次数', value: $('cardInterrupt').textContent },
     ];
 
     let y = 180;
@@ -1574,6 +2152,14 @@ function saveCard() {
       ctx.fillText(row.label, 80, y - 8);
       ctx.font = 'bold 17px sans-serif';
       ctx.fillStyle = '#2D3436';
+      // 文字溢出保护：超出可用宽度时自动缩小字号
+      const maxValueWidth = w - 80 - 160; // 左边距80 + 右侧印章区域160
+      let valueFontSize = 17;
+      ctx.font = `bold ${valueFontSize}px sans-serif`;
+      while (ctx.measureText(row.value).width > maxValueWidth && valueFontSize > 10) {
+        valueFontSize--;
+        ctx.font = `bold ${valueFontSize}px sans-serif`;
+      }
       ctx.fillText(row.value, 80, y + 14);
       // 分隔线
       ctx.strokeStyle = '#F0F0F0';
@@ -1690,6 +2276,85 @@ function launchConfetti() {
   setTimeout(() => { container.innerHTML = ''; }, 4000);
 }
 
+// ========== 累计倒计时轮数控制 ==========
+function changeAccRounds(delta) {
+  if (state.isSpeaking) return;
+  // 运行中/休息中/等待下一轮时，允许调整但不能低于当前轮次
+  const minRounds = (state.isRunning || state.isResting || state.waitingNextRound || state.isPaused)
+    ? state.accCurrentRound
+    : 1;
+  const newTotal = Math.max(minRounds, state.accTotalRounds + delta);
+  if (newTotal === state.accTotalRounds) return;
+  state.accTotalRounds = newTotal;
+  // 非运行状态下重置当前轮为1
+  if (!state.isRunning && !state.isResting && !state.waitingNextRound && !state.isPaused) {
+    state.accCurrentRound = 1;
+  }
+  updateAccDisplay();
+  // waitingNextRound 或 isResting 状态下，如果总轮数已减到当前轮，说明全部完成
+  if ((state.waitingNextRound || state.isResting) && state.accTotalRounds <= state.accCurrentRound) {
+    // 如果正在休息倒计时，先停掉
+    if (state.isResting) {
+      _stopTick();
+      state.isResting = false;
+      timerDisplay.classList.remove('resting');
+      $('restBadge').classList.remove('show');
+    }
+    state.waitingNextRound = false;
+    state.isFinished = true;
+    state.isRunning = false;
+    timeLabel.textContent = '🎉 完成！';
+    btnStart.innerHTML = '✅ 已完成';
+    btnStart.className = 'btn btn-start';
+    btnStart.disabled = true;
+    bcStatusDot.classList.remove('active');
+    broadcast.onFinish(state.childName);
+    launchConfetti();
+    return;
+  }
+  // 更新 timeLabel 显示最新轮数
+  if (state.isRunning || state.isPaused || state.isResting || state.waitingNextRound) {
+    if (state.isResting) {
+      timeLabel.textContent = `☕ 休息中... 下一轮：第${state.accCurrentRound + 1}轮`;
+    } else if (state.waitingNextRound) {
+      timeLabel.textContent = `☕ 休息结束，准备第${state.accCurrentRound + 1}轮`;
+      btnStart.innerHTML = `▶ 开始第${state.accCurrentRound + 1}轮`;
+    } else if (state.accTotalRounds > 1) {
+      timeLabel.textContent = state.isPaused
+        ? '已暂停'
+        : `跳绳中... 第${state.accCurrentRound}/${state.accTotalRounds}轮`;
+    } else {
+      timeLabel.textContent = state.isPaused ? '已暂停' : '跳绳中...';
+    }
+  }
+}
+
+function updateAccDisplay() {
+  $('accCurrent').textContent = state.accCurrentRound;
+  $('accTotal').textContent = state.accTotalRounds;
+  $('accTotalMinutes').textContent = state.accTotalRounds * state.selectedMinutes;
+}
+
+function resetAccRounds() {
+  if (state.isRunning || state.isResting || state.isSpeaking) return; // 运行中、休息中或播报中不允许重置
+  state.accCurrentRound = 1;
+  state.accTotalRounds = 1;
+  state.waitingNextRound = false;
+  state.interrupts = 0;
+  state.interruptsPerRound = [];
+  interruptCountEl.textContent = '0';
+  updateAccDisplay();
+  // 同步重置计时器显示（回到第1轮初始状态）
+  state.remainingSeconds = state.totalSeconds;
+  state.isFinished = false;
+  updateTimerDisplay();
+  updateRing();
+  timeLabel.textContent = '准备开始';
+  btnStart.innerHTML = '▶ 开始';
+  btnStart.className = 'btn btn-start';
+  btnStart.disabled = false;
+}
+
 // ========== 工具函数 ==========
 function formatDateTime(date) {
   const y = date.getFullYear();
@@ -1714,19 +2379,6 @@ function shakeElement(el) {
   el.style.animation = 'shake 0.4s ease';
 }
 
-// 添加 shake 动画
-const shakeStyle = document.createElement('style');
-shakeStyle.textContent = `
-  @keyframes shake {
-    0%, 100% { transform: translateX(0); }
-    20% { transform: translateX(-8px); }
-    40% { transform: translateX(8px); }
-    60% { transform: translateX(-4px); }
-    80% { transform: translateX(4px); }
-  }
-`;
-document.head.appendChild(shakeStyle);
-
 // 点击弹窗外部关闭
 $('cardModal').addEventListener('click', function(e) {
   if (e.target === this) closeCardModal();
@@ -1737,11 +2389,37 @@ $('nameModal').addEventListener('click', function(e) {
 
 // 初始化显示
 updateTimerDisplay();
+updateAccDisplay();
+
+// 页面可见性变化时校准计时器（手机锁屏/切后台恢复后补偿丢失的秒数）
+document.addEventListener('visibilitychange', function() {
+  if (document.visibilityState !== 'visible') return;
+  if (!state.isRunning && !state.isResting) return;
+  const now = Date.now();
+  const elapsed = Math.floor((now - _tickExpectedTime) / 1000);
+  if (elapsed <= 0) return;
+
+  if (state.isResting) {
+    state.restRemaining = Math.max(0, state.restRemaining - elapsed);
+    // 更新休息显示
+    const mins = Math.floor(state.restRemaining / 60);
+    const secs = state.restRemaining % 60;
+    timeDigits.textContent = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+    const progress = state.restRemaining / state.restSeconds;
+    ringProgress.style.strokeDashoffset = circumference * (1 - progress);
+  } else {
+    state.remainingSeconds = Math.max(0, state.remainingSeconds - elapsed);
+    updateTimerDisplay();
+    updateRing();
+  }
+  // 校准预期时间，让下一次 tick 立即触发以处理可能的轮次结束/休息结束
+  _tickExpectedTime = now;
+});
 
 // 从缓存恢复姓名和头像
 $('childName').textContent = state.childName;
 if (state.avatarSrc) {
-  $('avatarDisplay').innerHTML = `<img src="${state.avatarSrc}" alt="头像">`;
+  setAvatarImg($('avatarDisplay'), state.avatarSrc);
 }
 </script>
 </body>
